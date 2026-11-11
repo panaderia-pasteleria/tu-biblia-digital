@@ -36,11 +36,11 @@
     padding: 12px 20px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     flex-shrink: 0;
   }
-  #topbar h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; color: var(--text); }
-  #topbar span.sub { font-size: 12px; color: var(--text-muted); font-family: sans-serif; }
+  #topbar h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; color: var(--text); white-space: nowrap; }
+  #topbar span.sub { font-size: 12px; color: var(--text-muted); font-family: sans-serif; white-space: nowrap; }
   #layout {
     display: flex;
     flex: 1;
@@ -114,6 +114,10 @@
     border-bottom: 1px solid var(--border);
     background: var(--surface);
     flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
   }
   #book-title { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
   #book-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-family: sans-serif; }
@@ -190,7 +194,7 @@
     padding: 40px;
   }
   #empty-state .big-icon { font-size: 48px; }
-  #empty-state p { font-size: 14px; max-width: 280px; line-height: 1.5; }
+  #empty-state p { font-size: 14px; max-width: 320px; line-height: 1.5; }
   #loading-state {
     display: none;
     flex-direction: column;
@@ -230,7 +234,7 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   #books-list::-webkit-scrollbar, #verses-area::-webkit-scrollbar, #chapter-bar::-webkit-scrollbar, #busqueda-resultados::-webkit-scrollbar { width: 4px; height: 4px; }
   #books-list::-webkit-scrollbar-thumb, #verses-area::-webkit-scrollbar-thumb, #chapter-bar::-webkit-scrollbar-thumb, #busqueda-resultados::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
-  
+
   .top-btn {
     font-family: sans-serif;
     font-size: 12px;
@@ -251,39 +255,55 @@
   #btn-libros { display: none; }
   #sidebar-veil { display: none; }
 
-  @media (max-width: 760px) {
-    #topbar { padding: 10px 12px; gap: 6px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
-    #topbar h1 { font-size: 15px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    #topbar span.sub { display: none; }
-    .bt { display: none; }
-    #btn-libros { display: inline-flex; }
-    #layout { position: relative; }
-    #sidebar { position: absolute; z-index: 30; top: 0; bottom: 0; left: 0; width: 82%; max-width: 300px; min-width: 0; transform: translateX(-102%); transition: transform .2s; box-shadow: 4px 0 24px rgba(0,0,0,.15); }
-    #sidebar.open { transform: none; }
-    #sidebar-veil.open { display: block; position: absolute; inset: 0; z-index: 25; background: rgba(0,0,0,.3); }
-    .book-item { padding: 10px 12px; font-size: 15px; }
-    .tab-btn { padding: 12px 6px; font-size: 13px; }
-    #content-header { padding: 12px 14px 8px; }
-    #book-title { font-size: 19px; }
-    #chapter-bar { padding: 8px 12px; max-height: 96px; }
-    .ch-btn { padding: 6px 11px; font-size: 13px; }
-    #verses-area { padding: 12px 10px calc(84px + env(safe-area-inset-bottom, 0px)); }
-    .v-text { font-size: 17px; }
+  #lang-sel {
+    font-family: sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    padding: 6px 8px;
+    cursor: pointer;
   }
 
-  #lang-sel { font-family: sans-serif; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: var(--surface2); color: var(--text-secondary); border-radius: 6px; padding: 6px 6px; }
-  #content-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
   #btn-leer-cap { flex-shrink: 0; margin-top: 2px; }
   #btn-leer-cap.on { background: var(--accent); color: #fff; border-color: var(--accent); }
   .verse-row.leyendo { background: #fff4d6; }
-  #acciones-v { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; background: #1a1917; color: #fff; border-radius: 14px; padding: 8px; display: none; gap: 6px; flex-wrap: wrap; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,.3); font-family: sans-serif; max-width: 94vw; }
-  #acciones-v.open { display: flex; }
-  #acciones-v button { border: 0; border-radius: 10px; padding: 10px 14px; font-size: 14px; font-weight: 600; cursor: pointer; background: #2e2d2a; color: #fff; white-space: nowrap; }
-  #acciones-v button.pri { background: var(--accent); }
-  @media (max-width: 760px) { #lang-sel { max-width: 84px; } #content-header { padding-right: 12px; } }
-  @media (max-width: 380px) { #topbar { gap: 4px; padding-left: 8px; padding-right: 8px; } #topbar h1 { font-size: 13px; } }
 
-  /* MODAL COMÚN */
+  #acciones-v {
+    position: fixed;
+    left: 50%;
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    z-index: 60;
+    background: #1a1917;
+    color: #fff;
+    border-radius: 14px;
+    padding: 8px;
+    display: none;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,.3);
+    font-family: sans-serif;
+    max-width: 94vw;
+  }
+  #acciones-v.open { display: flex; }
+  #acciones-v button {
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #2e2d2a;
+    color: #fff;
+    white-space: nowrap;
+  }
+  #acciones-v button.pri { background: var(--accent); }
+
+  /* MODALES */
   #modal, #modal-buscar { display: none; position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 16px; }
   #modal.open, #modal-buscar.open { display: flex; }
   #modal-box, #modal-buscar-box { background: var(--surface); border-radius: 12px; width: 100%; max-width: 560px; max-height: 86vh; max-height: 86dvh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,.35); font-family: sans-serif; }
@@ -367,12 +387,35 @@
   mark.hl { background: #ffe082; color: inherit; padding: 0 1px; border-radius: 2px; }
 
   @media (max-width: 760px) {
+    #topbar { padding: 10px 12px; gap: 6px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+    #topbar h1 { font-size: 15px; flex: 1; overflow: hidden; text-overflow: ellipsis; }
+    #topbar span.sub { display: none; }
+    .bt { display: none; }
+    #btn-libros { display: inline-flex; }
+    #layout { position: relative; }
+    #sidebar { position: absolute; z-index: 30; top: 0; bottom: 0; left: 0; width: 82%; max-width: 300px; min-width: 0; transform: translateX(-102%); transition: transform .2s; box-shadow: 4px 0 24px rgba(0,0,0,.15); }
+    #sidebar.open { transform: none; }
+    #sidebar-veil.open { display: block; position: absolute; inset: 0; z-index: 25; background: rgba(0,0,0,.3); }
+    .book-item { padding: 10px 12px; font-size: 15px; }
+    .tab-btn { padding: 12px 6px; font-size: 13px; }
+    #content-header { padding: 12px 14px 8px; }
+    #book-title { font-size: 19px; }
+    #chapter-bar { padding: 8px 12px; max-height: 96px; }
+    .ch-btn { padding: 6px 11px; font-size: 13px; }
+    #verses-area { padding: 12px 10px calc(84px + env(safe-area-inset-bottom, 0px)); }
+    .v-text { font-size: 17px; }
+    #lang-sel { max-width: 86px; padding: 5px; }
     #modal-buscar { padding: 8px; }
     #modal-buscar-box { max-height: 96vh; max-height: 96dvh; border-radius: 10px; }
     #busqueda-head { padding: 10px 12px; gap: 8px; }
-    #busqueda-input { font-size: 16px; /* Evita zoom automático en Safari iOS */ }
+    #busqueda-input { font-size: 16px; }
     #busqueda-resultados { padding: 10px 12px; }
     .res-item .txt { font-size: 15px; }
+  }
+
+  @media (max-width: 380px) {
+    #topbar { gap: 4px; padding-left: 8px; padding-right: 8px; }
+    #topbar h1 { font-size: 13px; }
   }
 
   #toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: #1a1917; color: #fff; font-family: sans-serif; font-size: 13px; padding: 9px 14px; border-radius: 10px; z-index: 90; opacity: 0; pointer-events: none; transition: opacity .2s; max-width: 90vw; text-align: center; }
@@ -382,23 +425,26 @@
 <body>
 
 <div id="topbar">
-  <button class="top-btn" id="btn-libros" onclick="toggleLibros()" aria-label="Libros">📖<span class="bt"> Libros</span></button>
-  <h1>✦ Tu Biblia Digital</h1>
-  <span class="sub">Antiguo y Nuevo Testamento · Reina-Valera (SpaRV)</span>
-  <select id="lang-sel" style="margin-left:auto" aria-label="Voz para leer en voz alta" onchange="cambiarIdioma(this.value)">
-    <option value="es-419">🌎 LatAm</option><option value="es-ES">🇪🇸 España</option>
+  <button class="top-btn" id="btn-libros" onclick="toggleLibros()" aria-label="Libros">📖<span class="bt" id="lbl-libros-top"> Libros</span></button>
+  <h1 id="topbar-h1">✦ Tu Biblia Digital</h1>
+  <span class="sub" id="topbar-sub">Antiguo y Nuevo Testamento · Reina-Valera (SpaRV)</span>
+  <select id="lang-sel" style="margin-left:auto" aria-label="Idioma y voz" onchange="cambiarIdioma(this.value)">
+    <option value="es-419">🌎 LatAm</option>
+    <option value="es-ES">🇪🇸 España</option>
+    <option value="en">🇬🇧 English</option>
+    <option value="pt">🇵🇹 Português</option>
   </select>
-  <button class="top-btn" onclick="abrirBuscador()" aria-label="Buscar en la Biblia">🔍<span class="bt"> Buscar</span></button>
-  <button class="top-btn" onclick="abrirFavoritos()" aria-label="Favoritos">⭐<span class="bt"> Favoritos</span></button>
-  <button class="top-btn" onclick="abrirNotas()" aria-label="Notas">📝<span class="bt"> Notas</span></button>
+  <button class="top-btn" onclick="abrirBuscador()" aria-label="Buscar en la Biblia">🔍<span class="bt" id="lbl-buscar"> Buscar</span></button>
+  <button class="top-btn" onclick="abrirFavoritos()" aria-label="Favoritos">⭐<span class="bt" id="lbl-favs"> Favoritos</span></button>
+  <button class="top-btn" onclick="abrirNotas()" aria-label="Notas">📝<span class="bt" id="lbl-notas"> Notas</span></button>
 </div>
 
 <div id="layout">
   <div id="sidebar-veil" onclick="toggleLibros(false)"></div>
   <div id="sidebar">
     <div id="testament-tabs">
-      <button class="tab-btn active" onclick="switchTestament('at')">Antiguo Testamento</button>
-      <button class="tab-btn" onclick="switchTestament('nt')">Nuevo Testamento</button>
+      <button class="tab-btn active" id="tab-at" onclick="switchTestament('at')">Antiguo Testamento</button>
+      <button class="tab-btn" id="tab-nt" onclick="switchTestament('nt')">Nuevo Testamento</button>
     </div>
     <div id="testament-label">Libros</div>
     <div id="books-list"></div>
@@ -406,8 +452,10 @@
 
   <div id="main">
     <div id="content-header">
-      <div><div id="book-title">Selecciona un libro</div>
-      <div id="book-subtitle">Elige un libro del panel izquierdo para comenzar</div></div>
+      <div>
+        <div id="book-title">Selecciona un libro</div>
+        <div id="book-subtitle">Elige un libro del panel izquierdo para comenzar</div>
+      </div>
       <button class="top-btn" id="btn-leer-cap" onclick="toggleLeerCapitulo()" hidden>🔊 Escuchar capítulo</button>
     </div>
     <div id="chapter-bar"></div>
@@ -415,8 +463,8 @@
     <div id="verses-area">
       <div id="empty-state">
         <div class="big-icon">📖</div>
-        <p>Selecciona un libro y un capítulo para comenzar a leer la Biblia</p>
-        <p style="font-size:11px;margin-top:4px;">Toca cualquier versículo para escucharlo, guardarlo en favoritos o añadirle una nota</p>
+        <p id="empty-p1">Selecciona un libro y un capítulo para comenzar a leer la Biblia</p>
+        <p id="empty-p2" style="font-size:11px;margin-top:4px;">Toca cualquier versículo para escucharlo, guardarlo en favoritos o añadirle una nota</p>
       </div>
       <div id="loading-state">
         <div class="spinner"></div>
@@ -424,11 +472,11 @@
       </div>
       <div id="error-state" role="alert">
         <div class="err-icon">⚠️</div>
-        <div>No se pudo cargar la Biblia (SpaRV.json).</div>
+        <div id="err-title">No se pudo cargar la Biblia (SpaRV.json).</div>
         <div id="error-msg"></div>
         <div class="err-acciones">
-          <button class="top-btn pri" onclick="reintentarCarga()">Reintentar</button>
-          <label class="top-btn">Seleccionar SpaRV.json<input type="file" accept=".json,application/json" hidden onchange="cargarDesdeArchivo(this)"></label>
+          <button class="top-btn pri" id="btn-reintentar" onclick="reintentarCarga()">Reintentar</button>
+          <label class="top-btn" id="lbl-seleccionar-archivo">Seleccionar SpaRV.json<input type="file" accept=".json,application/json" hidden onchange="cargarDesdeArchivo(this)"></label>
         </div>
       </div>
     </div>
@@ -436,7 +484,7 @@
 </div>
 
 <div id="acciones-v" role="dialog" aria-label="Opciones del versículo">
-  <button class="pri" onclick="accionEscuchar()">🔊 Escuchar</button>
+  <button class="pri" id="bt-escuchar" onclick="accionEscuchar()">🔊 Escuchar</button>
   <button id="bt-fav" onclick="accionFavorito()">⭐ Favorito</button>
   <button id="bt-nota" onclick="abrirEditorNota()">📝 Nota</button>
   <button onclick="cerrarAcciones()" aria-label="Cerrar">✕</button>
@@ -473,9 +521,6 @@
 
 // =====================================================================
 //  Tu Biblia Digital — Reina-Valera (SpaRV)
-//  Estructura de SpaRV.json (verificada):
-//  { "books": [ { "name", "chapters": [ { "chapter", "name",
-//      "verses": [ { "verse", "chapter", "name", "text" } ] } ] } ] }
 // =====================================================================
 
 const TOTAL_LIBROS = 66;               // 39 del Antiguo + 27 del Nuevo Testamento
@@ -488,6 +533,286 @@ let currentChapter = 1;                // número de capítulo (1..n)
 let cargaId = 0;
 
 const $ = id => document.getElementById(id);
+
+// =====================================================================
+// DICCIONARIOS DE INTERNACIONALIZACIÓN DE LIBROS (66 LIBROS + VARIANTES)
+// =====================================================================
+
+const BOOKS_ES = {
+  "Genesis": "Génesis", "Exodus": "Éxodo", "Leviticus": "Levítico", "Numbers": "Números",
+  "Deuteronomy": "Deuteronomio", "Joshua": "Josué", "Judges": "Jueces", "Ruth": "Rut",
+  "1 Samuel": "1 Samuel", "I Samuel": "1 Samuel", "2 Samuel": "2 Samuel", "II Samuel": "2 Samuel",
+  "1 Kings": "1 Reyes", "I Kings": "1 Reyes", "2 Kings": "2 Reyes", "II Kings": "2 Reyes",
+  "1 Chronicles": "1 Crónicas", "I Chronicles": "1 Crónicas", "2 Chronicles": "2 Crónicas", "II Chronicles": "2 Crónicas",
+  "Ezra": "Esdras", "Nehemiah": "Nehemías", "Esther": "Ester", "Job": "Job",
+  "Psalms": "Salmos", "Proverbs": "Proverbios", "Ecclesiastes": "Eclesiastés",
+  "Song of Solomon": "Cantares", "Song of Songs": "Cantares",
+  "Isaiah": "Isaías", "Jeremiah": "Jeremías", "Lamentations": "Lamentaciones", "Ezekiel": "Ezequiel",
+  "Daniel": "Daniel", "Hosea": "Oseas", "Joel": "Joel", "Amos": "Amós", "Obadiah": "Abdías",
+  "Jonah": "Jonás", "Micah": "Miqueas", "Nahum": "Nahúm", "Habakkuk": "Habacuc",
+  "Zephaniah": "Sofonías", "Haggai": "Hageo", "Zechariah": "Zacarías", "Malachi": "Malaquías",
+  "Matthew": "Mateo", "Mark": "Marcos", "Luke": "Lucas", "John": "Juan", "Acts": "Hechos",
+  "Romans": "Romanos", "1 Corinthians": "1 Corintios", "I Corinthians": "1 Corintios",
+  "2 Corinthians": "2 Corintios", "II Corinthians": "2 Corintios", "Galatians": "Gálatas",
+  "Ephesians": "Efesios", "Philippians": "Filipenses", "Colossians": "Colosenses",
+  "1 Thessalonians": "1 Tesalonicenses", "I Thessalonians": "1 Tesalonicenses",
+  "2 Thessalonians": "2 Tesalonicenses", "II Thessalonians": "2 Tesalonicenses",
+  "1 Timothy": "1 Timoteo", "I Timothy": "1 Timoteo", "2 Timothy": "2 Timoteo", "II Timothy": "2 Timoteo",
+  "Titus": "Tito", "Philemon": "Filemón", "Hebrews": "Hebreos", "James": "Santiago",
+  "1 Peter": "1 Pedro", "I Peter": "1 Pedro", "2 Peter": "2 Pedro", "II Peter": "2 Pedro",
+  "1 John": "1 Juan", "I John": "1 Juan", "2 John": "2 Juan", "II John": "2 Juan",
+  "3 John": "3 Juan", "III John": "3 Juan", "Jude": "Judas",
+  "Revelation of John": "Apocalipsis", "Revelation": "Apocalipsis"
+};
+
+const BOOKS_EN = {
+  "Genesis": "Genesis", "Exodus": "Exodus", "Leviticus": "Leviticus", "Numbers": "Numbers",
+  "Deuteronomy": "Deuteronomy", "Joshua": "Joshua", "Judges": "Judges", "Ruth": "Ruth",
+  "1 Samuel": "1 Samuel", "I Samuel": "1 Samuel", "2 Samuel": "2 Samuel", "II Samuel": "2 Samuel",
+  "1 Kings": "1 Kings", "I Kings": "1 Kings", "2 Kings": "2 Kings", "II Kings": "2 Kings",
+  "1 Chronicles": "1 Chronicles", "I Chronicles": "1 Chronicles", "2 Chronicles": "2 Chronicles", "II Chronicles": "2 Chronicles",
+  "Ezra": "Ezra", "Nehemiah": "Nehemiah", "Esther": "Esther", "Job": "Job",
+  "Psalms": "Psalms", "Proverbs": "Proverbs", "Ecclesiastes": "Ecclesiastes",
+  "Song of Solomon": "Song of Solomon", "Song of Songs": "Song of Solomon",
+  "Isaiah": "Isaiah", "Jeremiah": "Jeremiah", "Lamentations": "Lamentations", "Ezekiel": "Ezekiel",
+  "Daniel": "Daniel", "Hosea": "Hosea", "Joel": "Joel", "Amos": "Amos", "Obadiah": "Obadiah",
+  "Jonah": "Jonah", "Micah": "Micah", "Nahum": "Nahum", "Habakkuk": "Habakkuk",
+  "Zephaniah": "Zephaniah", "Haggai": "Haggai", "Zechariah": "Zechariah", "Malachi": "Malachi",
+  "Matthew": "Matthew", "Mark": "Mark", "Luke": "Luke", "John": "John", "Acts": "Acts",
+  "Romans": "Romans", "1 Corinthians": "1 Corinthians", "I Corinthians": "1 Corinthians",
+  "2 Corinthians": "2 Corinthians", "II Corinthians": "2 Corinthians", "Galatians": "Galatians",
+  "Ephesians": "Ephesians", "Philippians": "Philippians", "Colossians": "Colossians",
+  "1 Thessalonians": "1 Thessalonians", "I Thessalonians": "1 Thessalonians",
+  "2 Thessalonians": "2 Thessalonians", "II Thessalonians": "2 Thessalonians",
+  "1 Timothy": "1 Timothy", "I Timothy": "1 Timothy", "2 Timothy": "2 Timothy", "II Timothy": "2 Timothy",
+  "Titus": "Titus", "Philemon": "Philemon", "Hebrews": "Hebrews", "James": "James",
+  "1 Peter": "1 Peter", "I Peter": "1 Peter", "2 Peter": "2 Peter", "II Peter": "2 Peter",
+  "1 John": "1 John", "I John": "1 John", "2 John": "2 John", "II John": "2 John",
+  "3 John": "3 John", "III John": "3 John", "Jude": "Jude",
+  "Revelation of John": "Revelation", "Revelation": "Revelation"
+};
+
+const BOOKS_PT = {
+  "Genesis": "Gênesis", "Exodus": "Êxodo", "Leviticus": "Levítico", "Numbers": "Números",
+  "Deuteronomy": "Deuteronômio", "Joshua": "Josué", "Judges": "Juízes", "Ruth": "Rute",
+  "1 Samuel": "1 Samuel", "I Samuel": "1 Samuel", "2 Samuel": "2 Samuel", "II Samuel": "2 Samuel",
+  "1 Kings": "1 Reis", "I Kings": "1 Reis", "2 Kings": "2 Reis", "II Kings": "2 Reis",
+  "1 Chronicles": "1 Crônicas", "I Chronicles": "1 Crônicas", "2 Chronicles": "2 Crônicas", "II Chronicles": "2 Crônicas",
+  "Ezra": "Esdras", "Nehemiah": "Neemias", "Esther": "Ester", "Job": "Jó",
+  "Psalms": "Salmos", "Proverbs": "Provérbios", "Ecclesiastes": "Eclesiastes",
+  "Song of Solomon": "Cantares", "Song of Songs": "Cantares",
+  "Isaiah": "Isaías", "Jeremiah": "Jeremias", "Lamentations": "Lamentações", "Ezekiel": "Ezequiel",
+  "Daniel": "Daniel", "Hosea": "Oseias", "Joel": "Joel", "Amos": "Amós", "Obadiah": "Obadias",
+  "Jonah": "Jonas", "Micah": "Miqueias", "Nahum": "Naum", "Habakkuk": "Habacuque",
+  "Zephaniah": "Sofonias", "Haggai": "Ageu", "Zechariah": "Zacarias", "Malachi": "Malaquias",
+  "Matthew": "Mateus", "Mark": "Marcos", "Luke": "Lucas", "John": "João", "Acts": "Atos",
+  "Romans": "Romanos", "1 Corinthians": "1 Coríntios", "I Corinthians": "1 Coríntios",
+  "2 Corinthians": "2 Coríntios", "II Corinthians": "2 Coríntios", "Galatians": "Gálatas",
+  "Ephesians": "Efésios", "Philippians": "Filipenses", "Colossians": "Colossenses",
+  "1 Thessalonians": "1 Tessalonicenses", "I Thessalonians": "1 Tessalonicenses",
+  "2 Thessalonians": "2 Tessalonicenses", "II Thessalonians": "2 Tessalonicenses",
+  "1 Timothy": "1 Timóteo", "I Timothy": "1 Timóteo", "2 Timothy": "2 Timóteo", "II Timothy": "2 Timóteo",
+  "Titus": "Tito", "Philemon": "Filemom", "Hebrews": "Hebreus", "James": "Tiago",
+  "1 Peter": "1 Pedro", "I Peter": "1 Pedro", "2 Peter": "2 Pedro", "II Peter": "2 Pedro",
+  "1 John": "1 João", "I John": "1 João", "2 John": "2 João", "II John": "2 João",
+  "3 John": "3 João", "III John": "3 João", "Jude": "Judas",
+  "Revelation of John": "Apocalipse", "Revelation": "Apocalipse"
+};
+
+const DICCIONARIOS_LIBROS = {
+  'es': BOOKS_ES,
+  'en': BOOKS_EN,
+  'pt': BOOKS_PT
+};
+
+const UI_TEXTS = {
+  'es': {
+    tituloApp: '✦ Tu Biblia Digital',
+    subtituloApp: 'Antiguo y Nuevo Testamento · Reina-Valera (SpaRV)',
+    at: 'Antiguo Testamento', nt: 'Nuevo Testamento',
+    atCount: 'Antiguo Testamento — 39 libros', ntCount: 'Nuevo Testamento — 27 libros',
+    libros: 'Libros', seleccionarLibro: 'Selecciona un libro',
+    eligeLibro: 'Elige un libro del panel izquierdo para comenzar',
+    capitulos: 'capítulo(s)', escucharCap: '🔊 Escuchar capítulo', pararAudio: '⏹ Parar',
+    favoritos: 'Favoritos', notas: 'Notas', buscar: 'Buscar', escuchar: '🔊 Escuchar',
+    favoritoBtn: '⭐ Favorito', quitarFavBtn: '★ Quitar favorito', notaBtn: '📝 Nota', editarNotaBtn: '📝 Editar nota',
+    buscarPlace: 'Buscar palabras en toda la Biblia...', buscarMin: 'Escribe al menos 2 letras para buscar...',
+    sinResultados: 'No se encontraron versículos con «{q}».', sinResultadosSub: 'No hay resultados.<br>Prueba con otras palabras o sinónimos.',
+    encontrados: 'Encontrados {n} versículo(s)', encontradosLim: 'Encontrados {n} versículos (mostrando los primeros {max})',
+    irVersiculo: 'Ir al versículo', quitar: 'Quitar', borrar: 'Borrar', editar: 'Editar', guardar: 'Guardar', cancelar: 'Cancelar',
+    sinFavs: 'Aún no tienes favoritos.<br>Toca un versículo y elige «⭐ Favorito».',
+    sinNotas: 'Aún no tienes notas.<br>Toca un versículo y elige «📝 Nota».',
+    notaPlace: 'Escribe tu nota...', confirmarBorrar: '¿Borrar esta nota?',
+    emptyP1: 'Selecciona un libro y un capítulo para comenzar a leer la Biblia',
+    emptyP2: 'Toca cualquier versículo para escucharlo, guardarlo en favoritos o añadirle una nota',
+    cargandoBiblia: 'Cargando la Biblia...', cargandoVersos: 'Cargando versículos...',
+    errCarga: 'No se pudo cargar la Biblia (SpaRV.json).', reintentar: 'Reintentar',
+    seleccionarArchivo: 'Seleccionar SpaRV.json', notaGuardada: '📝 Nota guardada',
+    notaEliminada: 'Nota eliminada', favAgregado: '⭐ Añadido a favoritos', favQuitado: 'Quitado de favoritos'
+  },
+  'en': {
+    tituloApp: '✦ Your Digital Bible',
+    subtituloApp: 'Old and New Testament · Reina-Valera (SpaRV)',
+    at: 'Old Testament', nt: 'New Testament',
+    atCount: 'Old Testament — 39 books', ntCount: 'New Testament — 27 books',
+    libros: 'Books', seleccionarLibro: 'Select a book',
+    eligeLibro: 'Choose a book from the left panel to begin reading',
+    capitulos: 'chapter(s)', escucharCap: '🔊 Listen to chapter', pararAudio: '⏹ Stop',
+    favoritos: 'Favorites', notas: 'Notes', buscar: 'Search', escuchar: '🔊 Listen',
+    favoritoBtn: '⭐ Favorite', quitarFavBtn: '★ Remove favorite', notaBtn: '📝 Note', editarNotaBtn: '📝 Edit note',
+    buscarPlace: 'Search words across the entire Bible...', buscarMin: 'Type at least 2 letters to search...',
+    sinResultados: 'No verses found matching «{q}».', sinResultadosSub: 'No results found.<br>Try different words or keywords.',
+    encontrados: 'Found {n} verse(s)', encontradosLim: 'Found {n} verses (showing first {max})',
+    irVersiculo: 'Go to verse', quitar: 'Remove', borrar: 'Delete', editar: 'Edit', guardar: 'Save', cancelar: 'Cancel',
+    sinFavs: 'No favorites yet.<br>Tap a verse and select «⭐ Favorite».',
+    sinNotas: 'No notes yet.<br>Tap a verse and select «📝 Note».',
+    notaPlace: 'Write your note...', confirmarBorrar: 'Delete this note?',
+    emptyP1: 'Select a book and a chapter to begin reading the Bible',
+    emptyP2: 'Tap any verse to listen to it, save to favorites or add a note',
+    cargandoBiblia: 'Loading Bible...', cargandoVersos: 'Loading verses...',
+    errCarga: 'Could not load Bible file (SpaRV.json).', reintentar: 'Retry',
+    seleccionarArchivo: 'Select SpaRV.json', notaGuardada: '📝 Note saved',
+    notaEliminada: 'Note deleted', favAgregado: '⭐ Added to favorites', favQuitado: 'Removed from favorites'
+  },
+  'pt': {
+    tituloApp: '✦ Sua Bíblia Digital',
+    subtituloApp: 'Antigo e Novo Testamento · Reina-Valera (SpaRV)',
+    at: 'Antigo Testamento', nt: 'Novo Testamento',
+    atCount: 'Antigo Testamento — 39 livros', ntCount: 'Novo Testamento — 27 livros',
+    libros: 'Livros', seleccionarLibro: 'Selecione um livro',
+    eligeLibro: 'Escolha um livro no painel esquerdo para começar a ler',
+    capitulos: 'capítulo(s)', escucharCap: '🔊 Ouvir capítulo', pararAudio: '⏹ Parar',
+    favoritos: 'Favoritos', notas: 'Notas', buscar: 'Pesquisar', escuchar: '🔊 Ouvir',
+    favoritoBtn: '⭐ Favorito', quitarFavBtn: '★ Remover favorito', notaBtn: '📝 Nota', editarNotaBtn: '📝 Editar nota',
+    buscarPlace: 'Pesquisar palavras em toda a Bíblia...', buscarMin: 'Digite pelo menos 2 letras para pesquisar...',
+    sinResultados: 'Nenhum versículo encontrado com «{q}».', sinResultadosSub: 'Nenhum resultado.<br>Tente outras palavras ou sinônimos.',
+    encontrados: 'Encontrado(s) {n} versículo(s)', encontradosLim: 'Encontrados {n} versículos (mostrando os primeiros {max})',
+    irVersiculo: 'Ir para o versículo', quitar: 'Remover', borrar: 'Excluir', editar: 'Editar', guardar: 'Salvar', cancelar: 'Cancelar',
+    sinFavs: 'Ainda não há favoritos.<br>Toque em um versículo e escolha «⭐ Favorito».',
+    sinNotas: 'Ainda não há notas.<br>Toque em um versículo e escolha «📝 Nota».',
+    notaPlace: 'Escreva sua nota...', confirmarBorrar: 'Excluir esta nota?',
+    emptyP1: 'Selecione um livro e um capítulo para começar a ler a Bíblia',
+    emptyP2: 'Toque em qualquer versículo para ouvi-lo, adicioná-lo aos favoritos ou criar uma nota',
+    cargandoBiblia: 'Carregando a Bíblia...', cargandoVersos: 'Carregando versículos...',
+    errCarga: 'Não foi possível carregar a Bíblia (SpaRV.json).', reintentar: 'Tentar novamente',
+    seleccionarArchivo: 'Selecionar SpaRV.json', notaGuardada: '📝 Nota salva',
+    notaEliminada: 'Nota excluída', favAgregado: '⭐ Adicionado aos favoritos', favQuitado: 'Removido dos favoritos'
+  }
+};
+
+const IDIOMAS = {
+  'es-419': { voz: ['es-MX', 'es-US', 'es-419', 'es-CO', 'es-AR', 'es'] },
+  'es-ES':  { voz: ['es-ES', 'es'] },
+  'en':     { voz: ['en-US', 'en-GB', 'en'] },
+  'pt':     { voz: ['pt-BR', 'pt-PT', 'pt'] }
+};
+
+let idioma = (() => {
+  try {
+    const v = localStorage.getItem('biblia_idioma');
+    return IDIOMAS[v] ? v : 'es-419';
+  } catch (e) {
+    return 'es-419';
+  }
+})();
+
+function obtenerLangBase(idm) {
+  if (!idm) return 'es';
+  if (idm.startsWith('es')) return 'es';
+  if (idm.startsWith('pt')) return 'pt';
+  if (idm.startsWith('en')) return 'en';
+  return 'es';
+}
+
+function nombreLibroTraducido(nombreEnglish) {
+  if (!nombreEnglish) return '';
+  const langKey = obtenerLangBase(idioma);
+  const dict = DICCIONARIOS_LIBROS[langKey] || DICCIONARIOS_LIBROS['es'];
+  return dict[nombreEnglish] || dict[nombreEnglish.trim()] || nombreEnglish;
+}
+
+function nombreLibro(gi, respaldo) {
+  const orig = (BIBLIA && BIBLIA[gi]) ? BIBLIA[gi].name : (respaldo || '');
+  return nombreLibroTraducido(orig);
+}
+
+function tUi(k, params) {
+  const langKey = obtenerLangBase(idioma);
+  const bundle = UI_TEXTS[langKey] || UI_TEXTS['es'];
+  let str = bundle[k] || UI_TEXTS['es'][k] || '';
+  if (params) {
+    for (const p in params) str = str.replace(`{${p}}`, params[p]);
+  }
+  return str;
+}
+
+function actualizarTextosUI() {
+  $('topbar-h1').textContent = tUi('tituloApp');
+  $('topbar-sub').textContent = tUi('subtituloApp');
+
+  const tabAt = $('tab-at'); if (tabAt) tabAt.textContent = tUi('at');
+  const tabNt = $('tab-nt'); if (tabNt) tabNt.textContent = tUi('nt');
+
+  $('testament-label').textContent = currentTestament === 'at' ? tUi('atCount') : tUi('ntCount');
+
+  const lblLib = $('lbl-libros-top'); if (lblLib) lblLib.textContent = ' ' + tUi('libros');
+  const lblBus = $('lbl-buscar'); if (lblBus) lblBus.textContent = ' ' + tUi('buscar');
+  const lblFav = $('lbl-favs'); if (lblFav) lblFav.textContent = ' ' + tUi('favoritos');
+  const lblNot = $('lbl-notas'); if (lblNot) lblNot.textContent = ' ' + tUi('notas');
+
+  const bCap = $('btn-leer-cap');
+  if (bCap) bCap.textContent = leyendoCap ? tUi('pararAudio') : tUi('escucharCap');
+
+  const ep1 = $('empty-p1'); if (ep1) ep1.textContent = tUi('emptyP1');
+  const ep2 = $('empty-p2'); if (ep2) ep2.textContent = tUi('emptyP2');
+
+  const lt = $('loading-text'); if (lt) lt.textContent = tUi('cargandoBiblia');
+  const et = $('err-title'); if (et) et.textContent = tUi('errCarga');
+  const br = $('btn-reintentar'); if (br) br.textContent = tUi('reintentar');
+
+  const bInp = $('busqueda-input');
+  if (bInp) {
+    bInp.placeholder = tUi('buscarPlace');
+    if (bInp.value.trim().length < 2) $('busqueda-info').textContent = tUi('buscarMin');
+  }
+
+  const bEsc = $('bt-escuchar'); if (bEsc) bEsc.textContent = tUi('escuchar');
+  if (versoSel) {
+    const k = keyV(versoSel.gi, versoSel.chapter, versoSel.v.n);
+    $('bt-fav').textContent = esFav(k) ? tUi('quitarFavBtn') : tUi('favoritoBtn');
+    $('bt-nota').textContent = notas[k] ? tUi('editarNotaBtn') : tUi('notaBtn');
+  }
+}
+
+function cambiarIdioma(v) {
+  if (!IDIOMAS[v]) return;
+  pararLectura();
+  idioma = v;
+  try { localStorage.setItem('biblia_idioma', v); } catch (e) {}
+
+  actualizarTextosUI();
+  renderBooks();
+
+  if (currentBook !== null && BIBLIA && BIBLIA[currentBook]) {
+    const libro = BIBLIA[currentBook];
+    const n = libro.chapters.length;
+    $('book-title').textContent = nombreLibro(currentBook);
+    $('book-subtitle').textContent = `${n} ${tUi('capitulos')} · ${currentBook < N_AT ? tUi('at') : tUi('nt')}`;
+  } else {
+    $('book-title').textContent = tUi('seleccionarLibro');
+    $('book-subtitle').textContent = currentTestament === 'at' ? tUi('at') : tUi('nt');
+  }
+
+  if ($('modal-buscar').classList.contains('open')) {
+    const q = $('busqueda-input').value;
+    if (q.trim().length >= 2) realizarBusqueda(q);
+  }
+  if ($('modal').classList.contains('open')) {
+    const titulo = $('modal-title').textContent;
+    if (titulo.includes('⭐') || titulo.includes('Favorit')) abrirFavoritos();
+    else if (titulo.includes('📝') || titulo.includes('Not')) abrirNotas();
+  }
+}
 
 // ---------- ALMACÉN LOCAL (favoritos y notas) ----------
 function lsGet(k, def) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch (e) { return def; } }
@@ -505,7 +830,7 @@ function toast(msg) {
 }
 
 // ---------- CARGA Y VALIDACIÓN DE SpaRV.json ----------
-let BIBLIA = null;            // data.books validado (66 libros, en el orden original del archivo)
+let BIBLIA = null;
 let bibliaPromesa = null;
 let ultimoErrorCarga = '';
 
@@ -526,12 +851,12 @@ function validarBiblia(data) {
     }
     libro.chapters.forEach((cap, j) => {
       if (!cap || cap.chapter !== j + 1 || !Array.isArray(cap.verses) || !cap.verses.length) {
-        throw new Error(`El libro «${libro.name}», capítulo ${j + 1}, no tiene el formato esperado ("chapter" / "verses").`);
+        throw new Error(`El libro «${libro.name}», capítulo ${j + 1}, no tiene el formato esperado.`);
       }
       for (let k = 0; k < cap.verses.length; k++) {
         const v = cap.verses[k];
         if (!v || !Number.isInteger(v.verse) || v.verse < 1 || typeof v.text !== 'string') {
-          throw new Error(`«${libro.name}» ${cap.chapter}: el versículo n.º ${k + 1} no tiene "verse" numérico o "text".`);
+          throw new Error(`«${libro.name}» ${cap.chapter}: el versículo n.º ${k + 1} no tiene formato válido.`);
         }
       }
     });
@@ -541,20 +866,20 @@ function validarBiblia(data) {
 function parseBiblia(texto) {
   let data;
   try { data = JSON.parse(texto); }
-  catch (e) { throw new Error('SpaRV.json no es un JSON válido (puede que el servidor haya devuelto una página HTML en lugar del archivo).'); }
+  catch (e) { throw new Error('SpaRV.json no es un JSON válido.'); }
   return validarBiblia(data);
 }
 async function descargarBiblia() {
   let errContenido = null, estado = 'sin respuesta del servidor';
   for (const ruta of RUTAS_BIBLIA) {
     let r;
-    try { r = await fetch(ruta); } catch (e) { estado = 'sin respuesta del servidor'; continue; }
+    try { r = await fetch(ruta); } catch (e) { estado = 'sin respuesta'; continue; }
     if (!r.ok) { estado = 'HTTP ' + r.status; continue; }
     try { return parseBiblia(await r.text()); }
     catch (e) { errContenido = errContenido || e; }
   }
   if (errContenido) throw errContenido;
-  throw new Error(`No se pudo descargar SpaRV.json (${estado}). Comprueba que el archivo está en la misma carpeta que index.html en el servidor. Si abres index.html con doble clic, el navegador bloquea la descarga: usa el botón «Seleccionar SpaRV.json».`);
+  throw new Error(`No se pudo descargar SpaRV.json (${estado}). Usa el botón «Seleccionar SpaRV.json».`);
 }
 function cargarBiblia() {
   if (BIBLIA) return Promise.resolve(BIBLIA);
@@ -591,9 +916,8 @@ function reintentarCarga() {
   showLoading();
   cargarBiblia().then(alCargarBiblia).catch(e => mostrarErrorCarga(e.message));
 }
-function nombreLibro(gi, respaldo) { return (BIBLIA && BIBLIA[gi]) ? BIBLIA[gi].name : (respaldo || ''); }
 
-// ---------- ESTADOS DEL ÁREA DE LECTURA ----------
+// ---------- ESTADOS ----------
 function setEstados(vacio, carga, error) {
   $('empty-state').style.display = vacio ? 'flex' : 'none';
   $('loading-state').style.display = carga ? 'flex' : 'none';
@@ -623,12 +947,12 @@ function switchTestament(t, keep) {
   document.querySelectorAll('.tab-btn').forEach((b, i) =>
     b.classList.toggle('active', (i === 0 && t === 'at') || (i === 1 && t === 'nt'))
   );
-  $('testament-label').textContent = t === 'at' ? 'Antiguo Testamento — 39 libros' : 'Nuevo Testamento — 27 libros';
+  $('testament-label').textContent = t === 'at' ? tUi('atCount') : tUi('ntCount');
   if (keep) { renderBooks(); return; }
   currentBook = null;
   renderBooks();
-  $('book-title').textContent = 'Selecciona un libro';
-  $('book-subtitle').textContent = t === 'at' ? 'Antiguo Testamento' : 'Nuevo Testamento';
+  $('book-title').textContent = tUi('seleccionarLibro');
+  $('book-subtitle').textContent = t === 'at' ? tUi('at') : tUi('nt');
   $('chapter-bar').innerHTML = '';
   $('btn-leer-cap').hidden = true;
   cargaId++;
@@ -640,14 +964,14 @@ function switchTestament(t, keep) {
 function renderBooks() {
   const el = $('books-list');
   if (!BIBLIA) {
-    el.innerHTML = `<div class="book-item info">${ultimoErrorCarga ? 'No se pudo cargar la lista de libros.' : 'Cargando libros…'}</div>`;
+    el.innerHTML = `<div class="book-item info">${ultimoErrorCarga ? tUi('errCarga') : tUi('cargandoBiblia')}</div>`;
     return;
   }
   const ini = currentTestament === 'at' ? 0 : N_AT;
   const fin = currentTestament === 'at' ? N_AT : BIBLIA.length;
   let html = '';
   for (let gi = ini; gi < fin; gi++) {
-    html += `<div class="book-item${gi === currentBook ? ' active' : ''}" onclick="selectBook(${gi})" id="bi-${gi}">${esc(BIBLIA[gi].name)}</div>`;
+    html += `<div class="book-item${gi === currentBook ? ' active' : ''}" onclick="selectBook(${gi})" id="bi-${gi}">${esc(nombreLibro(gi))}</div>`;
   }
   el.innerHTML = html;
 }
@@ -661,8 +985,8 @@ function selectBook(gi, cap) {
   const el = $('bi-' + gi);
   if (el) { el.classList.add('active'); el.scrollIntoView({ block: 'nearest' }); }
   const n = libro.chapters.length;
-  $('book-title').textContent = libro.name;
-  $('book-subtitle').textContent = `${n} capítulo${n > 1 ? 's' : ''} · ${gi < N_AT ? 'Antiguo' : 'Nuevo'} Testamento`;
+  $('book-title').textContent = nombreLibro(gi);
+  $('book-subtitle').textContent = `${n} ${tUi('capitulos')} · ${gi < N_AT ? tUi('at') : tUi('nt')}`;
   renderChapters(libro, currentChapter);
   return loadChapter(gi, currentChapter);
 }
@@ -692,12 +1016,12 @@ function toggleLibros(abrir) {
   sb.classList.toggle('open', on); v.classList.toggle('open', on);
 }
 
-// ---------- CAPÍTULOS: libro.chapters[n-1].verses ----------
+// ---------- CAPÍTULOS Y VERSÍCULOS ----------
 async function loadChapter(gi, chapter) {
   const id = ++cargaId;
   document.querySelectorAll('.verse-row').forEach(r => r.remove());
   $('btn-leer-cap').hidden = true;
-  $('loading-text').textContent = 'Cargando versículos...';
+  $('loading-text').textContent = tUi('cargandoVersos');
   showLoading();
   toggleLibros(false);
   pararLectura();
@@ -706,7 +1030,7 @@ async function loadChapter(gi, chapter) {
     if (id !== cargaId) return;
     const libro = biblia[gi];
     const cap = libro && libro.chapters[chapter - 1];
-    if (!cap) throw new Error(`No hay datos para ${libro ? libro.name : 'el libro ' + (gi + 1)} ${chapter} en SpaRV.json.`);
+    if (!cap) throw new Error(`Sin datos para ${nombreLibro(gi)} ${chapter}.`);
     hideStates();
     renderVerses(cap.verses, libro.name, chapter, gi);
   } catch (e) {
@@ -741,39 +1065,32 @@ function renderVerses(verses, bookName, chapter, gi) {
   area.scrollTop = 0;
 }
 
-// ---------- LECTURA EN VOZ ALTA ----------
-const IDIOMAS = {
-  'es-419': { voz: ['es-MX', 'es-US', 'es-419', 'es-CO', 'es-AR', 'es'] },
-  'es-ES':  { voz: ['es-ES', 'es'] }
-};
-let idioma = (() => { try { const v = localStorage.getItem('biblia_idioma'); return IDIOMAS[v] ? v : 'es-419'; } catch (e) { return 'es-419'; } })();
+// ---------- LECTURA EN VOZ ALTA (SÍNTESIS DE VOZ) ----------
 let lecturaId = 0;
 let leyendoCap = false;
 let locucionActual = null;
 
-function cambiarIdioma(v) {
-  if (!IDIOMAS[v]) return;
-  pararLectura(); idioma = v;
-  try { localStorage.setItem('biblia_idioma', v); } catch (e) {}
-}
 function hayVoz() { return 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined'; }
+
 function vozPara(lang) {
   const vs = (hayVoz() && speechSynthesis.getVoices()) || [];
-  const norm = x => x.lang.replace('_', '-').toLowerCase();
-  for (const pref of IDIOMAS[lang].voz) {
+  const norm = x => (x.lang || '').replace('_', '-').toLowerCase();
+  const prefs = (IDIOMAS[lang] && IDIOMAS[lang].voz) || ['es'];
+  for (const pref of prefs) {
     const p = pref.toLowerCase();
     const v = vs.find(x => norm(x) === p) || vs.find(x => norm(x).startsWith(p));
     if (v) return v;
   }
   return null;
 }
+
 function hablar(texto, id, alTerminar, retraso) {
   if (!hayVoz()) { pararLectura(); toast('Este navegador no puede leer en voz alta.'); return; }
   if (id !== lecturaId) return;
   const u = new SpeechSynthesisUtterance(texto);
   const v = vozPara(idioma);
   if (v) u.voice = v;
-  u.lang = v ? v.lang : IDIOMAS[idioma].voz[0];
+  u.lang = v ? v.lang : (IDIOMAS[idioma] ? IDIOMAS[idioma].voz[0] : 'es');
   u.rate = 0.95;
   u.onend = () => {
     if (id !== lecturaId) return;
@@ -790,14 +1107,16 @@ function hablar(texto, id, alTerminar, retraso) {
   const lanzar = () => { if (id === lecturaId) speechSynthesis.speak(u); };
   if (retraso) setTimeout(lanzar, retraso); else lanzar();
 }
+
 function pararLectura() {
   lecturaId++;
   leyendoCap = false;
   locucionActual = null;
   if (hayVoz()) speechSynthesis.cancel();
   document.querySelectorAll('.verse-row.leyendo').forEach(r => r.classList.remove('leyendo'));
-  const b = $('btn-leer-cap'); if (b) { b.classList.remove('on'); b.textContent = '🔊 Escuchar capítulo'; }
+  const b = $('btn-leer-cap'); if (b) { b.classList.remove('on'); b.textContent = tUi('escucharCap'); }
 }
+
 function leerDesde(i, id, retraso) {
   if (id !== lecturaId) return;
   const filas = [...document.querySelectorAll('.verse-row[data-n]')];
@@ -810,6 +1129,7 @@ function leerDesde(i, id, retraso) {
   f.scrollIntoView({ block: 'center', behavior: 'smooth' });
   hablar(texto, id, () => leerDesde(i + 1, id), retraso);
 }
+
 function toggleLeerCapitulo() {
   if (leyendoCap) return pararLectura();
   const filas = [...document.querySelectorAll('.verse-row[data-n]')];
@@ -817,26 +1137,28 @@ function toggleLeerCapitulo() {
   pararLectura();
   const id = lecturaId;
   leyendoCap = true;
-  const b = $('btn-leer-cap'); b.classList.add('on'); b.textContent = '⏹ Parar';
+  const b = $('btn-leer-cap'); b.classList.add('on'); b.textContent = tUi('pararAudio');
   const sel = document.querySelector('.verse-row.selected[data-n]');
   leerDesde(sel ? filas.indexOf(sel) : 0, id, 50);
 }
 
-// ---------- MENÚ AL TOCAR UN VERSÍCULO ----------
+// ---------- MENÚ DE ACCIONES POR VERSÍCULO ----------
 let versoSel = null;
 function abrirAcciones(v, bookName, chapter, row, gi) {
   versoSel = { v, bookName, chapter, row, gi };
   const k = keyV(gi, chapter, v.n);
-  $('bt-fav').textContent = esFav(k) ? '★ Quitar favorito' : '⭐ Favorito';
-  $('bt-nota').textContent = notas[k] ? '📝 Editar nota' : '📝 Nota';
+  $('bt-escuchar').textContent = tUi('escuchar');
+  $('bt-fav').textContent = esFav(k) ? tUi('quitarFavBtn') : tUi('favoritoBtn');
+  $('bt-nota').textContent = notas[k] ? tUi('editarNotaBtn') : tUi('notaBtn');
   $('acciones-v').classList.add('open');
 }
 function cerrarAcciones() { $('acciones-v').classList.remove('open'); }
+
 function accionEscuchar() {
   if (!versoSel) return;
   const { v, row } = versoSel;
   cerrarAcciones();
-  if (!v.t.trim()) { toast('Este versículo no tiene texto en SpaRV.json.'); return; }
+  if (!v.t.trim()) { toast('Este versículo no contiene texto.'); return; }
   pararLectura();
   const id = lecturaId;
   row.classList.add('leyendo');
@@ -851,19 +1173,25 @@ function refrescarMarcas(row) {
   m.textContent = (esFav(k) ? '⭐' : '') + (notas[k] ? '📝' : '');
 }
 function refrescarTodasMarcas() { document.querySelectorAll('.verse-row[data-n]').forEach(refrescarMarcas); }
+
 function accionFavorito() {
   if (!versoSel) return;
   const { v, bookName, chapter, gi, row } = versoSel;
   const k = keyV(gi, chapter, v.n);
   cerrarAcciones();
-  if (esFav(k)) { favs = favs.filter(f => f.k !== k); toast('Quitado de favoritos'); }
-  else { favs.push({ k, gi, bn: bookName, c: chapter, n: v.n, t: v.t, f: Date.now() }); toast('⭐ Añadido a favoritos'); }
+  if (esFav(k)) {
+    favs = favs.filter(f => f.k !== k);
+    toast(tUi('favQuitado'));
+  } else {
+    favs.push({ k, gi, bn: bookName, c: chapter, n: v.n, t: v.t, f: Date.now() });
+    toast(tUi('favAgregado'));
+  }
   lsSet('biblia_favs', favs);
   refrescarMarcas(row);
 }
 function quitarFav(k) { favs = favs.filter(f => f.k !== k); lsSet('biblia_favs', favs); refrescarTodasMarcas(); }
 
-// ---------- MODAL (Favoritos / Notas) ----------
+// ---------- MODAL COMÚN ----------
 function abrirModal(titulo) {
   $('modal-title').textContent = titulo;
   const b = $('modal-body'); b.innerHTML = '';
@@ -871,13 +1199,24 @@ function abrirModal(titulo) {
   return b;
 }
 function cerrarModal() { $('modal').classList.remove('open'); }
+
 function abrirFavoritos() {
   cerrarAcciones();
-  const b = abrirModal('⭐ Favoritos (' + favs.length + ')');
-  if (!favs.length) { b.innerHTML = '<div class="vacio">Aún no tienes favoritos.<br>Toca un versículo y elige «⭐ Favorito».</div>'; return; }
+  const b = abrirModal(`⭐ ${tUi('favoritos')} (${favs.length})`);
+  if (!favs.length) {
+    b.innerHTML = `<div class="vacio">${tUi('sinFavs')}</div>`;
+    return;
+  }
   [...favs].sort((a, c) => (c.f || 0) - (a.f || 0)).forEach(f => {
     const d = document.createElement('div'); d.className = 'item';
-    d.innerHTML = `<div class="ref">${esc(nombreLibro(f.gi, f.bn))} ${esc(f.c)}:${esc(f.n)}</div><div class="txt">${esc(f.t)}</div><div class="acc"><button class="top-btn pri" data-a="ir">Ir al versículo</button><button class="top-btn" data-a="del">Quitar</button></div>`;
+    const nombreTrad = esc(nombreLibro(f.gi, f.bn));
+    d.innerHTML = `
+      <div class="ref">${nombreTrad} ${esc(f.c)}:${esc(f.n)}</div>
+      <div class="txt">${esc(f.t)}</div>
+      <div class="acc">
+        <button class="top-btn pri" data-a="ir">${esc(tUi('irVersiculo'))}</button>
+        <button class="top-btn" data-a="del">${esc(tUi('quitar'))}</button>
+      </div>`;
     d.querySelector('[data-a="ir"]').onclick = () => irA(f.gi, f.c, f.n);
     d.querySelector('[data-a="del"]').onclick = () => { quitarFav(f.k); abrirFavoritos(); };
     b.appendChild(d);
@@ -888,34 +1227,76 @@ function abrirFavoritos() {
 function abrirNotas() {
   cerrarAcciones();
   const lista = Object.keys(notas).map(k => Object.assign({ k }, notas[k])).sort((a, c) => (c.f || 0) - (a.f || 0));
-  const b = abrirModal('📝 Notas (' + lista.length + ')');
-  if (!lista.length) { b.innerHTML = '<div class="vacio">Aún no tienes notas.<br>Toca un versículo y elige «📝 Nota».</div>'; return; }
+  const b = abrirModal(`📝 ${tUi('notas')} (${lista.length})`);
+  if (!lista.length) {
+    b.innerHTML = `<div class="vacio">${tUi('sinNotas')}</div>`;
+    return;
+  }
   lista.forEach(nt => {
-    nt.bn = nombreLibro(nt.gi, nt.bn);
+    const nombreTrad = esc(nombreLibro(nt.gi, nt.bn));
     const d = document.createElement('div'); d.className = 'item';
-    d.innerHTML = `<div class="ref">${esc(nt.bn)} ${esc(nt.c)}:${esc(nt.n)}</div><div class="txt cita">${esc(nt.t)}</div><div class="nota">${esc(nt.nota)}</div><div class="acc"><button class="top-btn pri" data-a="ir">Ir al versículo</button><button class="top-btn" data-a="ed">Editar</button><button class="top-btn" data-a="del">Borrar</button></div>`;
+    d.innerHTML = `
+      <div class="ref">${nombreTrad} ${esc(nt.c)}:${esc(nt.n)}</div>
+      <div class="txt cita">${esc(nt.t)}</div>
+      <div class="nota">${esc(nt.nota)}</div>
+      <div class="acc">
+        <button class="top-btn pri" data-a="ir">${esc(tUi('irVersiculo'))}</button>
+        <button class="top-btn" data-a="ed">${esc(tUi('editar'))}</button>
+        <button class="top-btn" data-a="del">${esc(tUi('borrar'))}</button>
+      </div>`;
     d.querySelector('[data-a="ir"]').onclick = () => irA(nt.gi, nt.c, nt.n);
     d.querySelector('[data-a="ed"]').onclick = () => editarNota(nt);
-    d.querySelector('[data-a="del"]').onclick = () => { if (confirm('¿Borrar esta nota?')) { delete notas[nt.k]; lsSet('biblia_notas', notas); refrescarTodasMarcas(); abrirNotas(); } };
+    d.querySelector('[data-a="del"]').onclick = () => {
+      if (confirm(tUi('confirmarBorrar'))) {
+        delete notas[nt.k];
+        lsSet('biblia_notas', notas);
+        refrescarTodasMarcas();
+        abrirNotas();
+      }
+    };
     b.appendChild(d);
   });
 }
+
 function editarNota(nt) {
   const k = nt.k || keyV(nt.gi, nt.c, nt.n);
-  const b = abrirModal('📝 Nota — ' + nt.bn + ' ' + nt.c + ':' + nt.n);
+  const nombreTrad = esc(nombreLibro(nt.gi, nt.bn));
+  const b = abrirModal(`📝 ${tUi('notas')} — ${nombreTrad} ${nt.c}:${nt.n}`);
   const ex = notas[k];
-  b.innerHTML = `<div class="txt cita">${esc(nt.t)}</div><textarea id="nota-input" placeholder="Escribe tu nota..."></textarea><div class="acc"><button class="top-btn pri" id="nota-g">Guardar</button>${ex ? '<button class="top-btn" id="nota-b">Borrar</button>' : ''}<button class="top-btn" id="nota-c">Cancelar</button></div>`;
-  const ta = $('nota-input'); ta.value = ex ? ex.nota : ''; ta.focus();
+  b.innerHTML = `
+    <div class="txt cita">${esc(nt.t)}</div>
+    <textarea id="nota-input" placeholder="${esc(tUi('notaPlace'))}"></textarea>
+    <div class="acc">
+      <button class="top-btn pri" id="nota-g">${esc(tUi('guardar'))}</button>
+      ${ex ? `<button class="top-btn" id="nota-b">${esc(tUi('borrar'))}</button>` : ''}
+      <button class="top-btn" id="nota-c">${esc(tUi('cancelar'))}</button>
+    </div>`;
+  const ta = $('nota-input');
+  ta.value = ex ? ex.nota : '';
+  ta.focus();
   $('nota-g').onclick = () => {
     const txt = ta.value.trim();
-    if (!txt) { if (ex) { delete notas[k]; } }
-    else { notas[k] = { gi: nt.gi, bn: nt.bn, c: nt.c, n: nt.n, t: nt.t, nota: txt, f: Date.now() }; }
-    lsSet('biblia_notas', notas); refrescarTodasMarcas(); cerrarModal(); toast(txt ? '📝 Nota guardada' : 'Nota eliminada');
+    if (!txt) {
+      if (ex) delete notas[k];
+    } else {
+      notas[k] = { gi: nt.gi, bn: nt.bn, c: nt.c, n: nt.n, t: nt.t, nota: txt, f: Date.now() };
+    }
+    lsSet('biblia_notas', notas);
+    refrescarTodasMarcas();
+    cerrarModal();
+    toast(txt ? tUi('notaGuardada') : tUi('notaEliminada'));
   };
   const bb = $('nota-b');
-  if (bb) bb.onclick = () => { delete notas[k]; lsSet('biblia_notas', notas); refrescarTodasMarcas(); cerrarModal(); toast('Nota eliminada'); };
+  if (bb) bb.onclick = () => {
+    delete notas[k];
+    lsSet('biblia_notas', notas);
+    refrescarTodasMarcas();
+    cerrarModal();
+    toast(tUi('notaEliminada'));
+  };
   $('nota-c').onclick = cerrarModal;
 }
+
 function abrirEditorNota() {
   if (!versoSel) return; cerrarAcciones();
   const { v, bookName, chapter, gi } = versoSel;
@@ -963,12 +1344,12 @@ async function abrirBuscador() {
 
   if (!INDICE_BUSQUEDA) {
     if (!BIBLIA) {
-      $('busqueda-info').textContent = 'Cargando la Biblia para la búsqueda...';
+      $('busqueda-info').textContent = tUi('cargandoBiblia');
       try {
         await cargarBiblia();
-        $('busqueda-info').textContent = 'Escribe al menos 2 letras para buscar...';
+        $('busqueda-info').textContent = tUi('buscarMin');
       } catch (e) {
-        $('busqueda-info').textContent = 'Error al preparar la búsqueda: ' + e.message;
+        $('busqueda-info').textContent = 'Error: ' + e.message;
         return;
       }
     } else {
@@ -980,15 +1361,13 @@ async function abrirBuscador() {
   }
 }
 
-function cerrarBuscador() {
-  $('modal-buscar').classList.remove('open');
-}
+function cerrarBuscador() { $('modal-buscar').classList.remove('open'); }
 
 function limpiarBusqueda() {
   const inp = $('busqueda-input');
   inp.value = '';
   $('btn-limpiar-busq').classList.remove('show');
-  $('busqueda-info').textContent = 'Escribe al menos 2 letras para buscar...';
+  $('busqueda-info').textContent = tUi('buscarMin');
   $('busqueda-resultados').innerHTML = '';
   inp.focus();
 }
@@ -1023,7 +1402,7 @@ function realizarBusqueda(query) {
   const res = $('busqueda-resultados');
 
   if (q.length < 2) {
-    info.textContent = 'Escribe al menos 2 letras para buscar...';
+    info.textContent = tUi('buscarMin');
     res.innerHTML = '';
     return;
   }
@@ -1041,30 +1420,29 @@ function realizarBusqueda(query) {
         break;
       }
     }
-    if (coincide) {
-      resultados.push(item);
-    }
+    if (coincide) resultados.push(item);
   }
 
   const total = resultados.length;
   if (!total) {
-    info.textContent = `No se encontraron versículos con «${q}».`;
-    res.innerHTML = '<div class="vacio" style="font-size:13px; color:var(--text-muted); text-align:center; padding:24px 8px;">No hay resultados.<br>Prueba con otras palabras o sinónimos.</div>';
+    info.textContent = tUi('sinResultados', { q });
+    res.innerHTML = `<div class="vacio" style="font-size:13px; color:var(--text-muted); text-align:center; padding:24px 8px;">${tUi('sinResultadosSub')}</div>`;
     return;
   }
 
   const limite = Math.min(total, MAX_RENDER);
   info.textContent = total > MAX_RENDER
-    ? `Encontrados ${total} versículos (mostrando los primeros ${MAX_RENDER})`
-    : `Encontrados ${total} versículo${total > 1 ? 's' : ''}`;
+    ? tUi('encontradosLim', { n: total, max: MAX_RENDER })
+    : tUi('encontrados', { n: total });
 
   const frag = document.createDocumentFragment();
   for (let i = 0; i < limite; i++) {
     const r = resultados[i];
     const d = document.createElement('div');
     d.className = 'res-item';
+    const nombreTrad = esc(nombreLibro(r.gi, r.bn));
     d.innerHTML = `
-      <div class="ref">${esc(r.bn)} ${r.c}:${r.n}</div>
+      <div class="ref">${nombreTrad} ${r.c}:${r.n}</div>
       <div class="txt">${resaltarCoincidencias(r.t, terminos)}</div>
     `;
     d.onclick = () => {
@@ -1078,7 +1456,7 @@ function realizarBusqueda(query) {
   res.scrollTop = 0;
 }
 
-// ---------- IR A UNA CITA (favoritos / notas / búsqueda) ----------
+// ---------- IR A UNA CITA ----------
 async function irA(gi, cap, n) {
   cerrarModal(); pararLectura();
   try { await cargarBiblia(); }
@@ -1107,8 +1485,9 @@ window.addEventListener('keydown', e => {
   }
 });
 
-// ---------- INICIO ----------
+// ---------- INICIALIZACIÓN ----------
 $('lang-sel').value = idioma;
+actualizarTextosUI();
 switchTestament('at');
 cargarBiblia().then(alCargarBiblia).catch(e => mostrarErrorCarga(e.message));
 </script>
