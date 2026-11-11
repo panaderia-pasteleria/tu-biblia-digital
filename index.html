@@ -427,7 +427,7 @@
 <div id="topbar">
   <button class="top-btn" id="btn-libros" onclick="toggleLibros()" aria-label="Libros">📖<span class="bt" id="lbl-libros-top"> Libros</span></button>
   <div id="brand">
-    <img src="Tú_Biblia_Digital_logo_design_68386b2e_2K.jpg" alt="Tu Biblia Digital">
+    <img src="Tú_Biblia_Digital_logo_design_68386b2e_2K.jpg" alt="Tu Biblia Digital" style="height: 38px; width: auto; object-fit: contain;">
   </div>
   <span class="sub" id="topbar-sub">ANTIGUO TESTAMENTO Y NUEVO TESTAMENTO </span>
   <select id="lang-sel" style="margin-left:auto" aria-label="Idioma y voz" onchange="cambiarIdioma(this.value)">
@@ -464,7 +464,7 @@
 
     <div id="verses-area">
       <div id="empty-state">
-        <div class="big-icon">📖</div>
+        const h1 = $('topbar-h1'); if (h1) h1.textContent = tUi('tituloApp');
         <p id="empty-p1">Selecciona un libro y un capítulo para comenzar a leer la Biblia</p>
         <p id="empty-p2" style="font-size:11px;margin-top:4px;">Toca cualquier versículo para escucharlo, guardarlo en favoritos o añadirle una nota</p>
       </div>
