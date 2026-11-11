@@ -36,7 +36,7 @@
     padding: 12px 20px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     flex-shrink: 0;
   }
   #topbar h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; color: var(--text); }
@@ -228,19 +228,35 @@
     animation: spin 0.7s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  #books-list::-webkit-scrollbar, #verses-area::-webkit-scrollbar, #chapter-bar::-webkit-scrollbar { width: 4px; height: 4px; }
-  #books-list::-webkit-scrollbar-thumb, #verses-area::-webkit-scrollbar-thumb, #chapter-bar::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
-  .top-btn { font-family: sans-serif; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: var(--surface2); color: var(--text-secondary); border-radius: 6px; padding: 6px 10px; cursor: pointer; white-space: nowrap; }
+  #books-list::-webkit-scrollbar, #verses-area::-webkit-scrollbar, #chapter-bar::-webkit-scrollbar, #busqueda-resultados::-webkit-scrollbar { width: 4px; height: 4px; }
+  #books-list::-webkit-scrollbar-thumb, #verses-area::-webkit-scrollbar-thumb, #chapter-bar::-webkit-scrollbar-thumb, #busqueda-resultados::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+  
+  .top-btn {
+    font-family: sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
   .top-btn:hover { border-color: var(--accent); color: var(--accent); }
   .top-btn.pri { background: var(--accent); color: #fff; border-color: var(--accent); }
   #btn-libros { display: none; }
   #sidebar-veil { display: none; }
+
   @media (max-width: 760px) {
-    #topbar { padding: 10px 12px; gap: 8px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
-    #topbar h1 { font-size: 16px; flex: 1; }
+    #topbar { padding: 10px 12px; gap: 6px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+    #topbar h1 { font-size: 15px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     #topbar span.sub { display: none; }
     .bt { display: none; }
-    #btn-libros { display: inline-block; }
+    #btn-libros { display: inline-flex; }
     #layout { position: relative; }
     #sidebar { position: absolute; z-index: 30; top: 0; bottom: 0; left: 0; width: 82%; max-width: 300px; min-width: 0; transform: translateX(-102%); transition: transform .2s; box-shadow: 4px 0 24px rgba(0,0,0,.15); }
     #sidebar.open { transform: none; }
@@ -254,6 +270,7 @@
     #verses-area { padding: 12px 10px calc(84px + env(safe-area-inset-bottom, 0px)); }
     .v-text { font-size: 17px; }
   }
+
   #lang-sel { font-family: sans-serif; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: var(--surface2); color: var(--text-secondary); border-radius: 6px; padding: 6px 6px; }
   #content-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
   #btn-leer-cap { flex-shrink: 0; margin-top: 2px; }
@@ -263,14 +280,13 @@
   #acciones-v.open { display: flex; }
   #acciones-v button { border: 0; border-radius: 10px; padding: 10px 14px; font-size: 14px; font-weight: 600; cursor: pointer; background: #2e2d2a; color: #fff; white-space: nowrap; }
   #acciones-v button.pri { background: var(--accent); }
-  @media (max-width: 760px) { #lang-sel { max-width: 84px; } #topbar h1 { white-space: nowrap; font-size: 15px; overflow: hidden; text-overflow: ellipsis; min-width: 0; } #content-header { padding-right: 12px; } }
+  @media (max-width: 760px) { #lang-sel { max-width: 84px; } #content-header { padding-right: 12px; } }
+  @media (max-width: 380px) { #topbar { gap: 4px; padding-left: 8px; padding-right: 8px; } #topbar h1 { font-size: 13px; } }
 
-  @media (max-width: 380px) { #topbar { gap: 6px; padding-left: 10px; padding-right: 10px; } #topbar h1 { font-size: 14px; } }
-
-  /* MODAL (favoritos / notas) */
-  #modal { display: none; position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 16px; }
-  #modal.open { display: flex; }
-  #modal-box { background: var(--surface); border-radius: 12px; width: 100%; max-width: 560px; max-height: 86vh; max-height: 86dvh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,.35); font-family: sans-serif; }
+  /* MODAL COMÚN */
+  #modal, #modal-buscar { display: none; position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 16px; }
+  #modal.open, #modal-buscar.open { display: flex; }
+  #modal-box, #modal-buscar-box { background: var(--surface); border-radius: 12px; width: 100%; max-width: 560px; max-height: 86vh; max-height: 86dvh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,.35); font-family: sans-serif; }
   #modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
   #modal-title { font-size: 16px; font-weight: 700; color: var(--text); }
   #modal-body { padding: 12px 16px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
@@ -283,6 +299,82 @@
   #modal-body .cita { font-style: italic; color: var(--text-secondary); }
   #nota-input { width: 100%; min-height: 130px; resize: vertical; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; font-size: 15px; font-family: sans-serif; background: var(--bg); color: var(--text); outline: none; }
   #nota-input:focus { border-color: var(--accent); }
+
+  /* MODAL DE BÚSQUEDA GLOBAL */
+  #modal-buscar-box { max-width: 640px; height: 86vh; height: 86dvh; }
+  #busqueda-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  #busqueda-input-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 6px 12px;
+  }
+  #busqueda-input-wrap:focus-within { border-color: var(--accent); }
+  #busqueda-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+  }
+  #btn-limpiar-busq {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 2px 4px;
+    display: none;
+  }
+  #btn-limpiar-busq.show { display: block; }
+  #busqueda-info {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+    font-family: sans-serif;
+  }
+  #busqueda-resultados {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .res-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: var(--surface2);
+    cursor: pointer;
+    transition: background 0.1s, border-color 0.1s;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+  }
+  .res-item:hover { background: #eef3f8; border-color: var(--accent); }
+  .res-item .ref { font-size: 12px; font-weight: 700; color: var(--accent-text); font-family: sans-serif; }
+  .res-item .txt { font-family: Georgia, serif; font-size: 14px; line-height: 1.55; color: var(--text); }
+  mark.hl { background: #ffe082; color: inherit; padding: 0 1px; border-radius: 2px; }
+
+  @media (max-width: 760px) {
+    #modal-buscar { padding: 8px; }
+    #modal-buscar-box { max-height: 96vh; max-height: 96dvh; border-radius: 10px; }
+    #busqueda-head { padding: 10px 12px; gap: 8px; }
+    #busqueda-input { font-size: 16px; /* Evita zoom automático en Safari iOS */ }
+    #busqueda-resultados { padding: 10px 12px; }
+    .res-item .txt { font-size: 15px; }
+  }
+
   #toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: #1a1917; color: #fff; font-family: sans-serif; font-size: 13px; padding: 9px 14px; border-radius: 10px; z-index: 90; opacity: 0; pointer-events: none; transition: opacity .2s; max-width: 90vw; text-align: center; }
   #toast.show { opacity: 1; }
 </style>
@@ -294,11 +386,13 @@
   <h1>✦ Tu Biblia Digital</h1>
   <span class="sub">Antiguo y Nuevo Testamento · Reina-Valera (SpaRV)</span>
   <select id="lang-sel" style="margin-left:auto" aria-label="Voz para leer en voz alta" onchange="cambiarIdioma(this.value)">
-    <option value="es-419">🌎 Latinoamérica</option><option value="es-ES">🇪🇸 España</option>
+    <option value="es-419">🌎 LatAm</option><option value="es-ES">🇪🇸 España</option>
   </select>
+  <button class="top-btn" onclick="abrirBuscador()" aria-label="Buscar en la Biblia">🔍<span class="bt"> Buscar</span></button>
   <button class="top-btn" onclick="abrirFavoritos()" aria-label="Favoritos">⭐<span class="bt"> Favoritos</span></button>
   <button class="top-btn" onclick="abrirNotas()" aria-label="Notas">📝<span class="bt"> Notas</span></button>
 </div>
+
 <div id="layout">
   <div id="sidebar-veil" onclick="toggleLibros(false)"></div>
   <div id="sidebar">
@@ -348,12 +442,30 @@
   <button onclick="cerrarAcciones()" aria-label="Cerrar">✕</button>
 </div>
 
+<!-- MODAL DE BÚSQUEDA GLOBAL -->
+<div id="modal-buscar" role="dialog" aria-modal="true" onclick="if(event.target===this)cerrarBuscador()">
+  <div id="modal-buscar-box">
+    <div id="busqueda-head">
+      <div id="busqueda-input-wrap">
+        <span style="font-size:14px; color:var(--text-muted)">🔍</span>
+        <input type="text" id="busqueda-input" placeholder="Buscar palabras en toda la Biblia..." autocomplete="off" spellcheck="false" oninput="enInputBusqueda(this.value)">
+        <button type="button" id="btn-limpiar-busq" onclick="limpiarBusqueda()" aria-label="Limpiar búsqueda">✕</button>
+      </div>
+      <button class="top-btn" onclick="cerrarBuscador()" aria-label="Cerrar búsqueda">✕</button>
+    </div>
+    <div id="busqueda-info">Escribe al menos 2 letras para buscar...</div>
+    <div id="busqueda-resultados"></div>
+  </div>
+</div>
+
+<!-- MODAL COMÚN (Favoritos / Notas) -->
 <div id="modal" role="dialog" aria-modal="true" onclick="if(event.target===this)cerrarModal()">
   <div id="modal-box">
     <div id="modal-head"><h2 id="modal-title"></h2><button class="top-btn" onclick="cerrarModal()" aria-label="Cerrar">✕</button></div>
     <div id="modal-body"></div>
   </div>
 </div>
+
 <div id="toast"></div>
 
 <script>
@@ -448,7 +560,7 @@ function cargarBiblia() {
   if (BIBLIA) return Promise.resolve(BIBLIA);
   if (bibliaPromesa) return bibliaPromesa;
   bibliaPromesa = descargarBiblia().then(
-    b => { BIBLIA = b; ultimoErrorCarga = ''; return b; },
+    b => { BIBLIA = b; ultimoErrorCarga = ''; construirIndiceBusqueda(); return b; },
     e => { bibliaPromesa = null; throw e; }
   );
   return bibliaPromesa;
@@ -461,6 +573,7 @@ function cargarDesdeArchivo(input) {
       BIBLIA = parseBiblia(r.result);
       bibliaPromesa = Promise.resolve(BIBLIA);
       ultimoErrorCarga = '';
+      construirIndiceBusqueda();
       alCargarBiblia();
       toast('Biblia cargada');
     } catch (e) { mostrarErrorCarga('Archivo no válido: ' + e.message); }
@@ -608,7 +721,7 @@ function renderVerses(verses, bookName, chapter, gi) {
   $('btn-leer-cap').hidden = false;
   const frag = document.createDocumentFragment();
   verses.forEach(verso => {
-    const v = { n: verso.verse, t: verso.text };       // número = verse.verse · texto = verse.text (sin modificar)
+    const v = { n: verso.verse, t: verso.text };
     const row = document.createElement('div');
     row.className = 'verse-row';
     const num = document.createElement('span'); num.className = 'v-num'; num.textContent = v.n;
@@ -628,11 +741,7 @@ function renderVerses(verses, bookName, chapter, gi) {
   area.scrollTop = 0;
 }
 
-// ---------- LECTURA EN VOZ ALTA (voz del propio dispositivo) ----------
-// lecturaId identifica la sesión de lectura vigente. Cada vez que se inicia o se
-// para una lectura se incrementa; los eventos onend/onerror de locuciones antiguas
-// (incluidos los que dispara speechSynthesis.cancel()) comparan su id con el vigente
-// y se ignoran si ya no coincide. Así no se avanza ni se mezclan lecturas.
+// ---------- LECTURA EN VOZ ALTA ----------
 const IDIOMAS = {
   'es-419': { voz: ['es-MX', 'es-US', 'es-419', 'es-CO', 'es-AR', 'es'] },
   'es-ES':  { voz: ['es-ES', 'es'] }
@@ -640,7 +749,7 @@ const IDIOMAS = {
 let idioma = (() => { try { const v = localStorage.getItem('biblia_idioma'); return IDIOMAS[v] ? v : 'es-419'; } catch (e) { return 'es-419'; } })();
 let lecturaId = 0;
 let leyendoCap = false;
-let locucionActual = null;   // referencia viva: evita que el navegador la recoja antes de onend
+let locucionActual = null;
 
 function cambiarIdioma(v) {
   if (!IDIOMAS[v]) return;
@@ -695,7 +804,7 @@ function leerDesde(i, id, retraso) {
   if (i >= filas.length) return pararLectura();
   const f = filas[i];
   const texto = f.querySelector('.v-text').textContent;
-  if (!texto.trim()) return leerDesde(i + 1, id, retraso);   // versículo sin texto en SpaRV.json: se omite al leer
+  if (!texto.trim()) return leerDesde(i + 1, id, retraso);
   filas.forEach(r => r.classList.remove('leyendo'));
   f.classList.add('leyendo');
   f.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -754,7 +863,7 @@ function accionFavorito() {
 }
 function quitarFav(k) { favs = favs.filter(f => f.k !== k); lsSet('biblia_favs', favs); refrescarTodasMarcas(); }
 
-// ---------- MODAL ----------
+// ---------- MODAL (Favoritos / Notas) ----------
 function abrirModal(titulo) {
   $('modal-title').textContent = titulo;
   const b = $('modal-body'); b.innerHTML = '';
@@ -813,7 +922,163 @@ function abrirEditorNota() {
   editarNota({ gi, bn: bookName, c: chapter, n: v.n, t: v.t });
 }
 
-// ---------- IR A UNA CITA (favoritos / notas) ----------
+// ---------- BÚSQUEDA GLOBAL INSTANTÁNEA ----------
+let INDICE_BUSQUEDA = null;
+let timerBusqueda = null;
+
+function normalizarTexto(s) {
+  return String(s || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
+function construirIndiceBusqueda() {
+  if (INDICE_BUSQUEDA || !BIBLIA) return;
+  INDICE_BUSQUEDA = [];
+  for (let gi = 0; gi < BIBLIA.length; gi++) {
+    const libro = BIBLIA[gi];
+    for (let ci = 0; ci < libro.chapters.length; ci++) {
+      const cap = libro.chapters[ci];
+      for (let vi = 0; vi < cap.verses.length; vi++) {
+        const v = cap.verses[vi];
+        INDICE_BUSQUEDA.push({
+          gi,
+          bn: libro.name,
+          c: cap.chapter,
+          n: v.verse,
+          t: v.text,
+          norm: normalizarTexto(v.text)
+        });
+      }
+    }
+  }
+}
+
+async function abrirBuscador() {
+  cerrarAcciones();
+  $('modal-buscar').classList.add('open');
+  const input = $('busqueda-input');
+  setTimeout(() => input.focus(), 80);
+
+  if (!INDICE_BUSQUEDA) {
+    if (!BIBLIA) {
+      $('busqueda-info').textContent = 'Cargando la Biblia para la búsqueda...';
+      try {
+        await cargarBiblia();
+        $('busqueda-info').textContent = 'Escribe al menos 2 letras para buscar...';
+      } catch (e) {
+        $('busqueda-info').textContent = 'Error al preparar la búsqueda: ' + e.message;
+        return;
+      }
+    } else {
+      construirIndiceBusqueda();
+    }
+  }
+  if (input.value.trim().length >= 2) {
+    realizarBusqueda(input.value);
+  }
+}
+
+function cerrarBuscador() {
+  $('modal-buscar').classList.remove('open');
+}
+
+function limpiarBusqueda() {
+  const inp = $('busqueda-input');
+  inp.value = '';
+  $('btn-limpiar-busq').classList.remove('show');
+  $('busqueda-info').textContent = 'Escribe al menos 2 letras para buscar...';
+  $('busqueda-resultados').innerHTML = '';
+  inp.focus();
+}
+
+function enInputBusqueda(val) {
+  $('btn-limpiar-busq').classList.toggle('show', val.length > 0);
+  clearTimeout(timerBusqueda);
+  timerBusqueda = setTimeout(() => realizarBusqueda(val), 80);
+}
+
+function resaltarCoincidencias(texto, terminos) {
+  if (!terminos || !terminos.length) return esc(texto);
+  const mapaAcentos = {
+    'a': '[aáàäâ]', 'e': '[eéèëê]', 'i': '[iíìïî]', 'o': '[oóòöô]', 'u': '[uúùüû]',
+    'n': '[nñ]', 'c': '[cç]'
+  };
+  const patrones = terminos.map(t => {
+    const lim = normalizarTexto(t).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return lim.split('').map(ch => mapaAcentos[ch] || ch).join('');
+  });
+  const re = new RegExp('(' + patrones.join('|') + ')', 'gi');
+  return esc(texto).replace(re, '<mark class="hl">$1</mark>');
+}
+
+function realizarBusqueda(query) {
+  if (!INDICE_BUSQUEDA) {
+    if (BIBLIA) construirIndiceBusqueda();
+    else return;
+  }
+  const q = query.trim();
+  const info = $('busqueda-info');
+  const res = $('busqueda-resultados');
+
+  if (q.length < 2) {
+    info.textContent = 'Escribe al menos 2 letras para buscar...';
+    res.innerHTML = '';
+    return;
+  }
+
+  const terminos = normalizarTexto(q).split(/\s+/).filter(Boolean);
+  const MAX_RENDER = 100;
+  const resultados = [];
+
+  for (let i = 0; i < INDICE_BUSQUEDA.length; i++) {
+    const item = INDICE_BUSQUEDA[i];
+    let coincide = true;
+    for (let t = 0; t < terminos.length; t++) {
+      if (!item.norm.includes(terminos[t])) {
+        coincide = false;
+        break;
+      }
+    }
+    if (coincide) {
+      resultados.push(item);
+    }
+  }
+
+  const total = resultados.length;
+  if (!total) {
+    info.textContent = `No se encontraron versículos con «${q}».`;
+    res.innerHTML = '<div class="vacio" style="font-size:13px; color:var(--text-muted); text-align:center; padding:24px 8px;">No hay resultados.<br>Prueba con otras palabras o sinónimos.</div>';
+    return;
+  }
+
+  const limite = Math.min(total, MAX_RENDER);
+  info.textContent = total > MAX_RENDER
+    ? `Encontrados ${total} versículos (mostrando los primeros ${MAX_RENDER})`
+    : `Encontrados ${total} versículo${total > 1 ? 's' : ''}`;
+
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < limite; i++) {
+    const r = resultados[i];
+    const d = document.createElement('div');
+    d.className = 'res-item';
+    d.innerHTML = `
+      <div class="ref">${esc(r.bn)} ${r.c}:${r.n}</div>
+      <div class="txt">${resaltarCoincidencias(r.t, terminos)}</div>
+    `;
+    d.onclick = () => {
+      cerrarBuscador();
+      irA(r.gi, r.c, r.n);
+    };
+    frag.appendChild(d);
+  }
+  res.innerHTML = '';
+  res.appendChild(frag);
+  res.scrollTop = 0;
+}
+
+// ---------- IR A UNA CITA (favoritos / notas / búsqueda) ----------
 async function irA(gi, cap, n) {
   cerrarModal(); pararLectura();
   try { await cargarBiblia(); }
@@ -828,6 +1093,19 @@ async function irA(gi, cap, n) {
     row.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
 }
+
+// ---------- ATAJOS DE TECLADO ----------
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if ($('modal-buscar').classList.contains('open')) cerrarBuscador();
+    else if ($('modal').classList.contains('open')) cerrarModal();
+    else if ($('acciones-v').classList.contains('open')) cerrarAcciones();
+  }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+    e.preventDefault();
+    abrirBuscador();
+  }
+});
 
 // ---------- INICIO ----------
 $('lang-sel').value = idioma;
