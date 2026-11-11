@@ -1,9 +1,9 @@
-#brand { height: 38px; }
+#brand { height: 8px; }
   display:flex;
   align-items:center;
 }
 
-#brand img { height: 58px; }
+#brand img { height: 8px; }
   height:50px;
   width:auto;
   display:block;
