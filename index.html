@@ -426,10 +426,8 @@
 
 <div id="topbar">
   <button class="top-btn" id="btn-libros" onclick="toggleLibros()" aria-label="Libros">📖<span class="bt" id="lbl-libros-top"> Libros</span></button>
-  <div id="brand">
-    <img src="Tú_Biblia_Digital_logo_design_68386b2e_2K.jpg" alt="Tu Biblia Digital" style="height: 38px; width: auto; object-fit: contain;">
-  </div>
-  <span class="sub" id="topbar-sub">ANTIGUO TESTAMENTO Y NUEVO TESTAMENTO </span>
+  <h1 id="topbar-h1">✦ Tu Biblia Digital</h1>
+  <span class="sub" id="topbar-sub">Antiguo y Nuevo Testamento · Reina-Valera (SpaRV)</span>
   <select id="lang-sel" style="margin-left:auto" aria-label="Idioma y voz" onchange="cambiarIdioma(this.value)">
     <option value="es-419">🌎 LatAm</option>
     <option value="es-ES">🇪🇸 España</option>
@@ -464,7 +462,7 @@
 
     <div id="verses-area">
       <div id="empty-state">
-        $('topbar-h1').textContent = tUi('tituloApp');
+        <div class="big-icon">📖</div>
         <p id="empty-p1">Selecciona un libro y un capítulo para comenzar a leer la Biblia</p>
         <p id="empty-p2" style="font-size:11px;margin-top:4px;">Toca cualquier versículo para escucharlo, guardarlo en favoritos o añadirle una nota</p>
       </div>
@@ -522,7 +520,7 @@
 'use strict';
 
 // =====================================================================
-//  Tu Biblia Digital
+//  Tu Biblia Digital — Reina-Valera (SpaRV)
 // =====================================================================
 
 const TOTAL_LIBROS = 66;               // 39 del Antiguo + 27 del Nuevo Testamento
@@ -630,7 +628,7 @@ const DICCIONARIOS_LIBROS = {
 const UI_TEXTS = {
   'es': {
     tituloApp: '✦ Tu Biblia Digital',
-    subtituloApp: 'Antiguo y Nuevo Testamento',
+    subtituloApp: 'Antiguo y Nuevo Testamento · Reina-Valera (SpaRV)',
     at: 'Antiguo Testamento', nt: 'Nuevo Testamento',
     atCount: 'Antiguo Testamento — 39 libros', ntCount: 'Nuevo Testamento — 27 libros',
     libros: 'Libros', seleccionarLibro: 'Selecciona un libro',
@@ -654,7 +652,7 @@ const UI_TEXTS = {
   },
   'en': {
     tituloApp: '✦ Your Digital Bible',
-    subtituloApp: 'Old and New Testament',
+    subtituloApp: 'Old and New Testament · Reina-Valera (SpaRV)',
     at: 'Old Testament', nt: 'New Testament',
     atCount: 'Old Testament — 39 books', ntCount: 'New Testament — 27 books',
     libros: 'Books', seleccionarLibro: 'Select a book',
@@ -678,7 +676,7 @@ const UI_TEXTS = {
   },
   'pt': {
     tituloApp: '✦ Sua Bíblia Digital',
-    subtituloApp: 'Antigo e Novo Testamento',
+    subtituloApp: 'Antigo e Novo Testamento · Reina-Valera (SpaRV)',
     at: 'Antigo Testamento', nt: 'Novo Testamento',
     atCount: 'Antigo Testamento — 39 livros', ntCount: 'Novo Testamento — 27 livros',
     libros: 'Livros', seleccionarLibro: 'Selecione um livro',
