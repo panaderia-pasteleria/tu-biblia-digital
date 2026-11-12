@@ -5,12 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Tu Biblia Digital — Reina-Valera</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
- :root {
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
     --bg: #f5f4f0;
     --surface: #ffffff;
     --surface2: #f9f8f5;
     --border: #e2e0d8;
+    --border-strong: #c8c5bb;
     --text: #1a1917;
     --text-secondary: #6b6760;
     --text-muted: #a09d97;
@@ -21,6 +22,7 @@
   }
   body {
     font-family: 'Georgia', 'Times New Roman', serif;
+    background: #f5f4f0;
     background: var(--bg);
     color: var(--text);
     height: 100vh;
@@ -30,36 +32,67 @@
     overflow: hidden;
   }
   #topbar {
-    background: var(--surface);
+    background: #ffffff;
     border-bottom: 1px solid var(--border);
-    padding: 12px 20px;
+    padding: 10px 16px;
+    padding-top: calc(10px + env(safe-area-inset-top, 0px));
     display: flex;
     align-items: center;
     gap: 10px;
     flex-shrink: 0;
+    z-index: 20;
   }
-  #topbar h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; color: var(--text); white-space: nowrap; }
-  #topbar span.sub { font-size: 12px; color: var(--text-muted); font-family: sans-serif; white-space: nowrap; }
+  #brand {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  #brand img {
+    height: 40px;
+    width: auto;
+    max-width: 200px;
+    object-fit: contain;
+    display: block;
+  }
+  #topbar span.sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: sans-serif;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+  }
   #layout {
     display: flex;
     flex: 1;
     overflow: hidden;
+    position: relative;
   }
 
- /* SIDEBAR */
+  /* SIDEBAR (ESCRITORIO) */
   #sidebar {
-    width: 230px;
-    min-width: 230px;
-    background: #ffffff; /* <--- Fondo blanco 100% sólido */
-    border-right: 1px solid var(--border, #e2e0d8);
+    width: 250px;
+    min-width: 250px;
+    background: #ffffff !important;
+    border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    z-index: 10;
+  }
+  #sidebar-veil {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 9998;
+  }
+  #sidebar-veil.open {
+    display: block;
   }
   #testament-tabs {
     display: flex;
-    background: #ffffff;
-    border-bottom: 1px solid var(--border, #e2e0d8);
+    background: #ffffff !important;
+    border-bottom: 1px solid var(--border);
     flex-shrink: 0;
   }
   .tab-btn {
@@ -69,7 +102,7 @@
     font-weight: 600;
     font-family: sans-serif;
     border: none;
-    background: #ffffff;
+    background: #ffffff !important;
     cursor: pointer;
     color: var(--text-muted);
     border-bottom: 2px solid transparent;
@@ -85,28 +118,29 @@
     color: var(--text-muted);
     letter-spacing: 0.8px;
     text-transform: uppercase;
-    background: #ffffff;
+    background: #ffffff !important;
   }
   #books-list { 
     flex: 1; 
     overflow-y: auto; 
     padding: 4px 6px 12px; 
-    background: #ffffff; 
+    background: #ffffff !important; 
+    -webkit-overflow-scrolling: touch;
   }
   .book-item {
-    padding: 7px 10px;
-    font-size: 13px;
+    padding: 8px 12px;
+    font-size: 14px;
     font-family: sans-serif;
     color: var(--text-secondary);
     cursor: pointer;
     border-radius: 6px;
     transition: all 0.1s;
-    background: #ffffff;
+    background: #ffffff !important;
   }
-  .book-item:hover { background: var(--bg, #f5f4f0); color: var(--text); }
-  .book-item.active { background: var(--accent-bg); color: var(--accent-text); font-weight: 600; }
+  .book-item:hover { background: #f5f4f0 !important; color: var(--text); }
+  .book-item.active { background: var(--accent-bg) !important; color: var(--accent-text) !important; font-weight: 600; }
   .book-item.info { cursor: default; color: var(--text-muted); }
-  .book-item.info:hover { background: transparent; color: var(--text-muted); }
+  .book-item.info:hover { background: transparent !important; color: var(--text-muted); }
 
   /* MAIN */
   #main {
@@ -117,9 +151,9 @@
     background: var(--surface2);
   }
   #content-header {
-    padding: 14px 20px 10px;
+    padding: 12px 20px 10px;
     border-bottom: 1px solid var(--border);
-    background: var(--surface);
+    background: #ffffff;
     flex-shrink: 0;
     display: flex;
     align-items: flex-start;
@@ -135,7 +169,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
-    background: var(--surface);
+    background: #ffffff;
     max-height: 90px;
     overflow-y: auto;
     flex-shrink: 0;
@@ -187,7 +221,7 @@
   }
   .v-mark { font-size: 12px; padding-top: 4px; flex-shrink: 0; white-space: nowrap; }
 
-  /* EMPTY / LOADING / ERROR */
+  /* ESTADOS */
   #empty-state {
     display: flex;
     flex-direction: column;
@@ -239,8 +273,6 @@
     animation: spin 0.7s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  #books-list::-webkit-scrollbar, #verses-area::-webkit-scrollbar, #chapter-bar::-webkit-scrollbar, #busqueda-resultados::-webkit-scrollbar { width: 4px; height: 4px; }
-  #books-list::-webkit-scrollbar-thumb, #verses-area::-webkit-scrollbar-thumb, #chapter-bar::-webkit-scrollbar-thumb, #busqueda-resultados::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
 
   .top-btn {
     font-family: sans-serif;
@@ -260,7 +292,6 @@
   .top-btn:hover { border-color: var(--accent); color: var(--accent); }
   .top-btn.pri { background: var(--accent); color: #fff; border-color: var(--accent); }
   #btn-libros { display: none; }
-  #sidebar-veil { display: none; }
 
   #lang-sel {
     font-family: sans-serif;
@@ -283,7 +314,7 @@
     left: 50%;
     bottom: calc(18px + env(safe-area-inset-bottom, 0px));
     transform: translateX(-50%);
-    z-index: 60;
+    z-index: 1000;
     background: #1a1917;
     color: #fff;
     border-radius: 14px;
@@ -310,13 +341,54 @@
   }
   #acciones-v button.pri { background: var(--accent); }
 
-  /* MODALES */
-  #modal, #modal-buscar { display: none; position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 16px; }
+  /* =====================================================================
+     MODALES 100% OPACOS (FAVORITOS, NOTAS, BÚSQUEDA)
+     ===================================================================== */
+  #modal, #modal-buscar { 
+    display: none; 
+    position: fixed; 
+    inset: 0; 
+    z-index: 10000; 
+    background: rgba(0,0,0,.6); 
+    align-items: center; 
+    justify-content: center; 
+    padding: 16px; 
+  }
   #modal.open, #modal-buscar.open { display: flex; }
-  #modal-box, #modal-buscar-box { background: var(--surface); border-radius: 12px; width: 100%; max-width: 560px; max-height: 86vh; max-height: 86dvh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,.35); font-family: sans-serif; }
-  #modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  
+  #modal-box, #modal-buscar-box { 
+    background: #ffffff !important; 
+    border-radius: 12px; 
+    width: 100%; 
+    max-width: 560px; 
+    max-height: 86vh; 
+    max-height: 86dvh; 
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden; 
+    box-shadow: 0 20px 50px rgba(0,0,0,.45); 
+    font-family: sans-serif; 
+    position: relative;
+    z-index: 10001;
+  }
+  #modal-head { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    gap: 10px; 
+    padding: 14px 16px; 
+    border-bottom: 1px solid var(--border); 
+    background: #ffffff !important; 
+  }
   #modal-title { font-size: 16px; font-weight: 700; color: var(--text); }
-  #modal-body { padding: 12px 16px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+  #modal-body { 
+    padding: 12px 16px 16px; 
+    overflow-y: auto; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+    background: #ffffff !important; 
+  }
   #modal-body .item { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; background: var(--surface2); display: flex; flex-direction: column; gap: 6px; }
   #modal-body .ref { font-size: 12px; font-weight: 700; color: var(--accent-text); }
   #modal-body .txt { font-family: Georgia, serif; font-size: 14px; line-height: 1.55; color: var(--text); white-space: pre-wrap; }
@@ -327,9 +399,16 @@
   #nota-input { width: 100%; min-height: 130px; resize: vertical; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; font-size: 15px; font-family: sans-serif; background: var(--bg); color: var(--text); outline: none; }
   #nota-input:focus { border-color: var(--accent); }
 
-  /* MODAL DE BÚSQUEDA GLOBAL */
+  /* MODAL BÚSQUEDA GLOBAL */
   #modal-buscar-box { max-width: 640px; height: 86vh; height: 86dvh; }
-  #busqueda-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  #busqueda-head { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    padding: 12px 16px; 
+    border-bottom: 1px solid var(--border); 
+    background: #ffffff !important; 
+  }
   #busqueda-input-wrap {
     flex: 1;
     display: flex;
@@ -375,6 +454,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    background: #ffffff !important;
   }
   .res-item {
     border: 1px solid var(--border);
@@ -393,17 +473,38 @@
   .res-item .txt { font-family: Georgia, serif; font-size: 14px; line-height: 1.55; color: var(--text); }
   mark.hl { background: #ffe082; color: inherit; padding: 0 1px; border-radius: 2px; }
 
+  /* =====================================================================
+     MÓVIL (ANDROID / IPHONE) — AISLAMIENTO DEL MENÚ LATERAL
+     ===================================================================== */
   @media (max-width: 760px) {
-    #topbar { padding: 10px 12px; gap: 6px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
-    #topbar h1 { font-size: 15px; flex: 1; overflow: hidden; text-overflow: ellipsis; }
+    #topbar { padding: 8px 10px; gap: 6px; padding-top: calc(8px + env(safe-area-inset-top, 0px)); }
     #topbar span.sub { display: none; }
     .bt { display: none; }
     #btn-libros { display: inline-flex; }
-    #layout { position: relative; }
-    #sidebar { position: absolute; z-index: 30; top: 0; bottom: 0; left: 0; width: 82%; max-width: 300px; min-width: 0; transform: translateX(-102%); transition: transform .2s; box-shadow: 4px 0 24px rgba(0,0,0,.15); }
-    #sidebar.open { transform: none; }
-    #sidebar-veil.open { display: block; position: absolute; inset: 0; z-index: 25; background: rgba(0,0,0,.3); }
-    .book-item { padding: 10px 12px; font-size: 15px; }
+
+    #brand img { height: 32px; max-width: 140px; }
+
+    #sidebar { 
+      position: fixed !important; 
+      z-index: 9999 !important; 
+      top: 0 !important; 
+      bottom: 0 !important; 
+      left: 0 !important; 
+      width: 84% !important; 
+      max-width: 310px !important; 
+      height: 100vh !important;
+      height: 100dvh !important;
+      min-width: 0 !important; 
+      background: #ffffff !important; /* BLANCO PURO 100% OPACO */
+      transform: translateX(-105%) !important; 
+      transition: transform .22s ease-out !important; 
+      box-shadow: 6px 0 28px rgba(0,0,0,.35) !important; 
+    }
+    #sidebar.open { 
+      transform: translateX(0) !important; 
+    }
+
+    .book-item { padding: 11px 14px; font-size: 15px; }
     .tab-btn { padding: 12px 6px; font-size: 13px; }
     #content-header { padding: 12px 14px 8px; }
     #book-title { font-size: 19px; }
@@ -411,7 +512,8 @@
     .ch-btn { padding: 6px 11px; font-size: 13px; }
     #verses-area { padding: 12px 10px calc(84px + env(safe-area-inset-bottom, 0px)); }
     .v-text { font-size: 17px; }
-    #lang-sel { max-width: 86px; padding: 5px; }
+    #lang-sel { max-width: 84px; padding: 5px; font-size: 11px; }
+
     #modal-buscar { padding: 8px; }
     #modal-buscar-box { max-height: 96vh; max-height: 96dvh; border-radius: 10px; }
     #busqueda-head { padding: 10px 12px; gap: 8px; }
@@ -421,11 +523,11 @@
   }
 
   @media (max-width: 380px) {
-    #topbar { gap: 4px; padding-left: 8px; padding-right: 8px; }
-    #topbar h1 { font-size: 13px; }
+    #topbar { gap: 4px; padding-left: 6px; padding-right: 6px; }
+    #brand img { height: 28px; max-width: 110px; }
   }
 
-  #toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: #1a1917; color: #fff; font-family: sans-serif; font-size: 13px; padding: 9px 14px; border-radius: 10px; z-index: 90; opacity: 0; pointer-events: none; transition: opacity .2s; max-width: 90vw; text-align: center; }
+  #toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: #1a1917; color: #fff; font-family: sans-serif; font-size: 13px; padding: 9px 14px; border-radius: 10px; z-index: 10002; opacity: 0; pointer-events: none; transition: opacity .2s; max-width: 90vw; text-align: center; }
   #toast.show { opacity: 1; }
 </style>
 </head>
@@ -434,10 +536,10 @@
 <div id="topbar">
   <button class="top-btn" id="btn-libros" onclick="toggleLibros()" aria-label="Libros">📖<span class="bt" id="lbl-libros-top"> Libros</span></button>
   <div id="brand">
-  <img src="Tú_Biblia_Digital_logo_design_68386b2e_2K.jpg" alt="Tu Biblia Digital" style="height: 90px; width: auto; object-fit: contain; display: block;">
-  <span id="topbar-h1" style="display:none;"></span>
-</div>
-  <span class="sub" id="topbar-sub">ANTIGUO TESTAMENTO Y NUEVO TESTAMENTO</span>
+    <img src="Tú_Biblia_Digital_logo_design_68386b2e_2K.jpg" alt="Tu Biblia Digital">
+    <span id="topbar-h1" style="display:none;"></span>
+  </div>
+  <span class="sub" id="topbar-sub">Antiguo y Nuevo Testamento · Reina-Valera (SpaRV)</span>
   <select id="lang-sel" style="margin-left:auto" aria-label="Idioma y voz" onchange="cambiarIdioma(this.value)">
     <option value="es-419">🌎 LatAm</option>
     <option value="es-ES">🇪🇸 España</option>
@@ -500,7 +602,7 @@
   <button onclick="cerrarAcciones()" aria-label="Cerrar">✕</button>
 </div>
 
-<!-- MODAL DE BÚSQUEDA GLOBAL -->
+<!-- MODAL BÚSQUEDA GLOBAL -->
 <div id="modal-buscar" role="dialog" aria-modal="true" onclick="if(event.target===this)cerrarBuscador()">
   <div id="modal-buscar-box">
     <div id="busqueda-head">
@@ -529,25 +631,18 @@
 <script>
 'use strict';
 
-// =====================================================================
-//  Tu Biblia Digital
-// =====================================================================
-
-const TOTAL_LIBROS = 66;               // 39 del Antiguo + 27 del Nuevo Testamento
-const N_AT = 39;                       // los libros 0..38 son el Antiguo Testamento
+const TOTAL_LIBROS = 66;
+const N_AT = 39;
 const RUTAS_BIBLIA = ['/SpaRV.json', 'SpaRV.json'];
 
 let currentTestament = 'at';
-let currentBook = null;                // índice del libro dentro de data.books (0..65)
-let currentChapter = 1;                // número de capítulo (1..n)
+let currentBook = null;
+let currentChapter = 1;
 let cargaId = 0;
 
 const $ = id => document.getElementById(id);
 
-// =====================================================================
-// DICCIONARIOS DE INTERNACIONALIZACIÓN DE LIBROS (66 LIBROS + VARIANTES)
-// =====================================================================
-
+// DICCIONARIOS DE INTERNACIONALIZACIÓN
 const BOOKS_ES = {
   "Genesis": "Génesis", "Exodus": "Éxodo", "Leviticus": "Levítico", "Numbers": "Números",
   "Deuteronomy": "Deuteronomio", "Joshua": "Josué", "Judges": "Jueces", "Ruth": "Rut",
@@ -595,7 +690,7 @@ const BOOKS_EN = {
   "1 Thessalonians": "1 Thessalonians", "I Thessalonians": "1 Thessalonians",
   "2 Thessalonians": "2 Thessalonians", "II Thessalonians": "2 Thessalonians",
   "1 Timothy": "1 Timothy", "I Timothy": "1 Timothy", "2 Timothy": "2 Timothy", "II Timothy": "2 Timothy",
-  "Titus": "Titus", "Philemon": "Philemon", "Hebrews": "Hebrews", "James": "James",
+  "Titus": "Titus", "Philemon": "Philemon", "Hebrews": "Hebreos", "James": "James",
   "1 Peter": "1 Peter", "I Peter": "1 Peter", "2 Peter": "2 Peter", "II Peter": "2 Peter",
   "1 John": "1 John", "I John": "1 John", "2 John": "2 John", "II John": "2 John",
   "3 John": "3 John", "III John": "3 John", "Jude": "Jude",
@@ -757,8 +852,8 @@ function tUi(k, params) {
 }
 
 function actualizarTextosUI() {
-  $('topbar-h1').textContent = tUi('tituloApp');
-  $('topbar-sub').textContent = tUi('subtituloApp');
+  const h1 = $('topbar-h1'); if (h1) h1.textContent = tUi('tituloApp');
+  const sub = $('topbar-sub'); if (sub) sub.textContent = tUi('subtituloApp');
 
   const tabAt = $('tab-at'); if (tabAt) tabAt.textContent = tUi('at');
   const tabNt = $('tab-nt'); if (tabNt) tabNt.textContent = tUi('nt');
@@ -824,7 +919,7 @@ function cambiarIdioma(v) {
   }
 }
 
-// ---------- ALMACÉN LOCAL (favoritos y notas) ----------
+// ALMACÉN LOCAL
 function lsGet(k, def) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch (e) { return def; } }
 function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 let favs = lsGet('biblia_favs', []);
@@ -839,7 +934,7 @@ function toast(msg) {
   clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 1800);
 }
 
-// ---------- CARGA Y VALIDACIÓN DE SpaRV.json ----------
+// CARGA Y VALIDACIÓN DE SpaRV.json
 let BIBLIA = null;
 let bibliaPromesa = null;
 let ultimoErrorCarga = '';
@@ -927,7 +1022,7 @@ function reintentarCarga() {
   cargarBiblia().then(alCargarBiblia).catch(e => mostrarErrorCarga(e.message));
 }
 
-// ---------- ESTADOS ----------
+// ESTADOS
 function setEstados(vacio, carga, error) {
   $('empty-state').style.display = vacio ? 'flex' : 'none';
   $('loading-state').style.display = carga ? 'flex' : 'none';
@@ -951,7 +1046,7 @@ function mostrarEstadoInicial() {
   else showLoading();
 }
 
-// ---------- NAVEGACIÓN ----------
+// NAVEGACIÓN
 function switchTestament(t, keep) {
   currentTestament = t;
   document.querySelectorAll('.tab-btn').forEach((b, i) =>
@@ -1022,11 +1117,12 @@ function selectChapter(n) {
 
 function toggleLibros(abrir) {
   const sb = $('sidebar'), v = $('sidebar-veil');
-  const on = abrir === undefined ? !sb.classList.contains('open') : abrir;
-  sb.classList.toggle('open', on); v.classList.toggle('open', on);
+  const on = abrir === undefined ? !sb.classList.contains('open') : Boolean(abrir);
+  sb.classList.toggle('open', on);
+  v.classList.toggle('open', on);
 }
 
-// ---------- CAPÍTULOS Y VERSÍCULOS ----------
+// CAPÍTULOS Y VERSÍCULOS
 async function loadChapter(gi, chapter) {
   const id = ++cargaId;
   document.querySelectorAll('.verse-row').forEach(r => r.remove());
@@ -1075,7 +1171,7 @@ function renderVerses(verses, bookName, chapter, gi) {
   area.scrollTop = 0;
 }
 
-// ---------- LECTURA EN VOZ ALTA (SÍNTESIS DE VOZ) ----------
+// SÍNTESIS DE VOZ
 let lecturaId = 0;
 let leyendoCap = false;
 let locucionActual = null;
@@ -1152,7 +1248,7 @@ function toggleLeerCapitulo() {
   leerDesde(sel ? filas.indexOf(sel) : 0, id, 50);
 }
 
-// ---------- MENÚ DE ACCIONES POR VERSÍCULO ----------
+// ACCIONES DE VERSÍCULO
 let versoSel = null;
 function abrirAcciones(v, bookName, chapter, row, gi) {
   versoSel = { v, bookName, chapter, row, gi };
@@ -1175,7 +1271,7 @@ function accionEscuchar() {
   hablar(v.t, id, () => row.classList.remove('leyendo'), 50);
 }
 
-// ---------- FAVORITOS ----------
+// FAVORITOS
 function refrescarMarcas(row) {
   if (!row || !row.dataset) return;
   const k = keyV(+row.dataset.gi, +row.dataset.c, +row.dataset.n);
@@ -1201,7 +1297,7 @@ function accionFavorito() {
 }
 function quitarFav(k) { favs = favs.filter(f => f.k !== k); lsSet('biblia_favs', favs); refrescarTodasMarcas(); }
 
-// ---------- MODAL COMÚN ----------
+// MODAL COMÚN
 function abrirModal(titulo) {
   $('modal-title').textContent = titulo;
   const b = $('modal-body'); b.innerHTML = '';
@@ -1233,7 +1329,7 @@ function abrirFavoritos() {
   });
 }
 
-// ---------- NOTAS ----------
+// NOTAS
 function abrirNotas() {
   cerrarAcciones();
   const lista = Object.keys(notas).map(k => Object.assign({ k }, notas[k])).sort((a, c) => (c.f || 0) - (a.f || 0));
@@ -1313,7 +1409,7 @@ function abrirEditorNota() {
   editarNota({ gi, bn: bookName, c: chapter, n: v.n, t: v.t });
 }
 
-// ---------- BÚSQUEDA GLOBAL INSTANTÁNEA ----------
+// BÚSQUEDA GLOBAL
 let INDICE_BUSQUEDA = null;
 let timerBusqueda = null;
 
@@ -1466,7 +1562,7 @@ function realizarBusqueda(query) {
   res.scrollTop = 0;
 }
 
-// ---------- IR A UNA CITA ----------
+// NAVEGACIÓN DIRECTA
 async function irA(gi, cap, n) {
   cerrarModal(); pararLectura();
   try { await cargarBiblia(); }
@@ -1482,10 +1578,11 @@ async function irA(gi, cap, n) {
   }
 }
 
-// ---------- ATAJOS DE TECLADO ----------
+// ATAJOS DE TECLADO
 window.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    if ($('modal-buscar').classList.contains('open')) cerrarBuscador();
+    if ($('sidebar').classList.contains('open')) toggleLibros(false);
+    else if ($('modal-buscar').classList.contains('open')) cerrarBuscador();
     else if ($('modal').classList.contains('open')) cerrarModal();
     else if ($('acciones-v').classList.contains('open')) cerrarAcciones();
   }
@@ -1495,11 +1592,23 @@ window.addEventListener('keydown', e => {
   }
 });
 
-// ---------- INICIALIZACIÓN ----------
+// INICIALIZACIÓN
 $('lang-sel').value = idioma;
 actualizarTextosUI();
 switchTestament('at');
 cargarBiblia().then(alCargarBiblia).catch(e => mostrarErrorCarga(e.message));
+
+// PURGA DE CACHÉ DE VERSIONES ANTERIORES
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    for (let r of regs) r.unregister();
+  });
+}
+if ('caches' in window) {
+  caches.keys().then(keys => {
+    for (let k of keys) caches.delete(k);
+  });
+}
 </script>
 </body>
 </html>
