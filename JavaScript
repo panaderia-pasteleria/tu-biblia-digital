@@ -1,1 +1,0 @@
-const h1 = $('topbar-h1'); if (h1) h1.textContent = tUi('tituloApp');
