@@ -1494,5 +1494,10 @@ actualizarTextosUI();
 switchTestament('at');
 cargarBiblia().then(alCargarBiblia).catch(e => mostrarErrorCarga(e.message));
 </script>
-</body>
+ <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+</script>
+ </body>
 </html>
