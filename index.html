@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Tu Biblia Digital — Reina-Valera</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -32,7 +35,7 @@
     overflow: hidden;
   }
   #topbar {
-    background: #ffffff;
+    background: #ffffff !important;
     border-bottom: 1px solid var(--border);
     padding: 10px 16px;
     padding-top: calc(10px + env(safe-area-inset-top, 0px));
@@ -48,9 +51,9 @@
     flex-shrink: 0;
   }
   #brand img {
-    height: 40px;
+    height: 38px;
     width: auto;
-    max-width: 200px;
+    max-width: 190px;
     object-fit: contain;
     display: block;
   }
@@ -68,11 +71,14 @@
     position: relative;
   }
 
-  /* SIDEBAR (ESCRITORIO) */
+  /* =====================================================================
+     SIDEBAR (FONDO BLANCO 100% OPACO)
+     ===================================================================== */
   #sidebar {
     width: 250px;
     min-width: 250px;
     background: #ffffff !important;
+    background-color: #ffffff !important;
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
@@ -342,22 +348,23 @@
   #acciones-v button.pri { background: var(--accent); }
 
   /* =====================================================================
-     MODALES 100% OPACOS (FAVORITOS, NOTAS, BÚSQUEDA)
+     MODALES (FAVORITOS, NOTAS, BÚSQUEDA) 100% OPACOS
      ===================================================================== */
   #modal, #modal-buscar { 
     display: none; 
-    position: fixed; 
-    inset: 0; 
-    z-index: 10000; 
-    background: rgba(0,0,0,.6); 
+    position: fixed !important; 
+    inset: 0 !important; 
+    z-index: 10000 !important; 
+    background: rgba(0, 0, 0, 0.6) !important; 
     align-items: center; 
     justify-content: center; 
     padding: 16px; 
   }
-  #modal.open, #modal-buscar.open { display: flex; }
+  #modal.open, #modal-buscar.open { display: flex !important; }
   
   #modal-box, #modal-buscar-box { 
     background: #ffffff !important; 
+    background-color: #ffffff !important;
     border-radius: 12px; 
     width: 100%; 
     max-width: 560px; 
@@ -369,7 +376,7 @@
     box-shadow: 0 20px 50px rgba(0,0,0,.45); 
     font-family: sans-serif; 
     position: relative;
-    z-index: 10001;
+    z-index: 10001 !important;
   }
   #modal-head { 
     display: flex; 
@@ -379,6 +386,7 @@
     padding: 14px 16px; 
     border-bottom: 1px solid var(--border); 
     background: #ffffff !important; 
+    background-color: #ffffff !important;
   }
   #modal-title { font-size: 16px; font-weight: 700; color: var(--text); }
   #modal-body { 
@@ -388,6 +396,7 @@
     flex-direction: column; 
     gap: 10px; 
     background: #ffffff !important; 
+    background-color: #ffffff !important;
   }
   #modal-body .item { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; background: var(--surface2); display: flex; flex-direction: column; gap: 6px; }
   #modal-body .ref { font-size: 12px; font-weight: 700; color: var(--accent-text); }
@@ -408,6 +417,7 @@
     padding: 12px 16px; 
     border-bottom: 1px solid var(--border); 
     background: #ffffff !important; 
+    background-color: #ffffff !important;
   }
   #busqueda-input-wrap {
     flex: 1;
@@ -455,6 +465,7 @@
     flex-direction: column;
     gap: 8px;
     background: #ffffff !important;
+    background-color: #ffffff !important;
   }
   .res-item {
     border: 1px solid var(--border);
@@ -495,7 +506,8 @@
       height: 100vh !important;
       height: 100dvh !important;
       min-width: 0 !important; 
-      background: #ffffff !important; /* BLANCO PURO 100% OPACO */
+      background: #ffffff !important; 
+      background-color: #ffffff !important;
       transform: translateX(-105%) !important; 
       transition: transform .22s ease-out !important; 
       box-shadow: 6px 0 28px rgba(0,0,0,.35) !important; 
@@ -553,7 +565,7 @@
 
 <div id="layout">
   <div id="sidebar-veil" onclick="toggleLibros(false)"></div>
-  <div id="sidebar">
+  <div id="sidebar" style="background:#ffffff !important; background-color:#ffffff !important;">
     <div id="testament-tabs">
       <button class="tab-btn active" id="tab-at" onclick="switchTestament('at')">Antiguo Testamento</button>
       <button class="tab-btn" id="tab-nt" onclick="switchTestament('nt')">Nuevo Testamento</button>
@@ -604,7 +616,7 @@
 
 <!-- MODAL BÚSQUEDA GLOBAL -->
 <div id="modal-buscar" role="dialog" aria-modal="true" onclick="if(event.target===this)cerrarBuscador()">
-  <div id="modal-buscar-box">
+  <div id="modal-buscar-box" style="background:#ffffff !important; background-color:#ffffff !important;">
     <div id="busqueda-head">
       <div id="busqueda-input-wrap">
         <span style="font-size:14px; color:var(--text-muted)">🔍</span>
@@ -620,7 +632,7 @@
 
 <!-- MODAL COMÚN (Favoritos / Notas) -->
 <div id="modal" role="dialog" aria-modal="true" onclick="if(event.target===this)cerrarModal()">
-  <div id="modal-box">
+  <div id="modal-box" style="background:#ffffff !important; background-color:#ffffff !important;">
     <div id="modal-head"><h2 id="modal-title"></h2><button class="top-btn" onclick="cerrarModal()" aria-label="Cerrar">✕</button></div>
     <div id="modal-body"></div>
   </div>
@@ -630,6 +642,18 @@
 
 <script>
 'use strict';
+
+// PURGA Y DESACTIVACIÓN DE CACHÉ DE CUALQUIER SERVICE WORKER ANTIGUO
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(regs) {
+    for (let r of regs) { r.unregister(); }
+  });
+}
+if ('caches' in window) {
+  caches.keys().then(function(names) {
+    for (let name of names) { caches.delete(name); }
+  });
+}
 
 const TOTAL_LIBROS = 66;
 const N_AT = 39;
@@ -674,7 +698,7 @@ const BOOKS_EN = {
   "Genesis": "Genesis", "Exodus": "Exodus", "Leviticus": "Leviticus", "Numbers": "Numbers",
   "Deuteronomy": "Deuteronomy", "Joshua": "Joshua", "Judges": "Judges", "Ruth": "Ruth",
   "1 Samuel": "1 Samuel", "I Samuel": "1 Samuel", "2 Samuel": "2 Samuel", "II Samuel": "2 Samuel",
-  "1 Kings": "1 Kings", "I Kings": "1 Kings", "2 Kings": "2 Kings", "II Kings": "2 Kings",
+  "1 Kings": "1 Kings", "I Kings": "1 Kings", "2 Kings": "2 Kings", "II Kings": "2 Reyes",
   "1 Chronicles": "1 Chronicles", "I Chronicles": "1 Chronicles", "2 Chronicles": "2 Chronicles", "II Chronicles": "2 Chronicles",
   "Ezra": "Ezra", "Nehemiah": "Nehemiah", "Esther": "Esther", "Job": "Job",
   "Psalms": "Psalms", "Proverbs": "Proverbs", "Ecclesiastes": "Ecclesiastes",
@@ -690,7 +714,7 @@ const BOOKS_EN = {
   "1 Thessalonians": "1 Thessalonians", "I Thessalonians": "1 Thessalonians",
   "2 Thessalonians": "2 Thessalonians", "II Thessalonians": "2 Thessalonians",
   "1 Timothy": "1 Timothy", "I Timothy": "1 Timothy", "2 Timothy": "2 Timothy", "II Timothy": "2 Timothy",
-  "Titus": "Titus", "Philemon": "Philemon", "Hebrews": "Hebreos", "James": "James",
+  "Titus": "Titus", "Philemon": "Philemon", "Hebrews": "Hebrews", "James": "James",
   "1 Peter": "1 Peter", "I Peter": "1 Peter", "2 Peter": "2 Peter", "II Peter": "2 Peter",
   "1 John": "1 John", "I John": "1 John", "2 John": "2 John", "II John": "2 John",
   "3 John": "3 John", "III John": "3 John", "Jude": "Jude",
@@ -1597,18 +1621,6 @@ $('lang-sel').value = idioma;
 actualizarTextosUI();
 switchTestament('at');
 cargarBiblia().then(alCargarBiblia).catch(e => mostrarErrorCarga(e.message));
-
-// PURGA DE CACHÉ DE VERSIONES ANTERIORES
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(regs => {
-    for (let r of regs) r.unregister();
-  });
-}
-if ('caches' in window) {
-  caches.keys().then(keys => {
-    for (let k of keys) caches.delete(k);
-  });
-}
 </script>
 </body>
 </html>
