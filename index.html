@@ -46,19 +46,20 @@
     overflow: hidden;
   }
 
-  /* SIDEBAR */
+ /* SIDEBAR */
   #sidebar {
     width: 230px;
     min-width: 230px;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
+    background: #ffffff; /* <--- Fondo blanco 100% sólido */
+    border-right: 1px solid var(--border, #e2e0d8);
     display: flex;
     flex-direction: column;
     overflow: hidden;
   }
   #testament-tabs {
     display: flex;
-    border-bottom: 1px solid var(--border);
+    background: #ffffff;
+    border-bottom: 1px solid var(--border, #e2e0d8);
     flex-shrink: 0;
   }
   .tab-btn {
@@ -68,7 +69,7 @@
     font-weight: 600;
     font-family: sans-serif;
     border: none;
-    background: transparent;
+    background: #ffffff;
     cursor: pointer;
     color: var(--text-muted);
     border-bottom: 2px solid transparent;
@@ -84,8 +85,14 @@
     color: var(--text-muted);
     letter-spacing: 0.8px;
     text-transform: uppercase;
+    background: #ffffff;
   }
-  #books-list { flex: 1; overflow-y: auto; padding: 4px 6px 12px; }
+  #books-list { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding: 4px 6px 12px; 
+    background: #ffffff; 
+  }
   .book-item {
     padding: 7px 10px;
     font-size: 13px;
@@ -94,8 +101,9 @@
     cursor: pointer;
     border-radius: 6px;
     transition: all 0.1s;
+    background: #ffffff;
   }
-  .book-item:hover { background: var(--bg); color: var(--text); }
+  .book-item:hover { background: var(--bg, #f5f4f0); color: var(--text); }
   .book-item.active { background: var(--accent-bg); color: var(--accent-text); font-weight: 600; }
   .book-item.info { cursor: default; color: var(--text-muted); }
   .book-item.info:hover { background: transparent; color: var(--text-muted); }
