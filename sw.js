@@ -7,13 +7,19 @@ const FILES_TO_CACHE = [
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
-  '/apple-touch-icon.png'
+  '/apple-touch-icon.png',
+  encodeURI('/Tú_Biblia_Digital_logo_design_68386b2e_2K.jpg')
 ];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE))
+    caches.open(CACHE_NAME).then(cache => {
+      // addAll blindado para que se instale sin importar fallos de red puntuales
+      return Promise.allSettled(
+        FILES_TO_CACHE.map(url => cache.add(url))
+      );
+    })
   );
 });
 
@@ -23,7 +29,7 @@ self.addEventListener('activate', event => {
       return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            return caches.delete(key); // Destruye la caché vieja transparente
+            return caches.delete(key); // Destruye cualquier caché vieja congelada
           }
         })
       );
@@ -34,21 +40,23 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Para la página principal e index.html: primero busca la versión nueva en la red
+  // Para la navegación e index.html: Network-First (primero pide la versión nueva al servidor)
   if (event.request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('index.html')) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          const resClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, resClone));
+          if (response && response.status === 200) {
+            const resClone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, resClone));
+          }
           return response;
         })
-        .catch(() => caches.match(event.request))
+        .catch(() => caches.match(event.request).then(res => res || caches.match('/index.html')))
     );
     return;
   }
 
-  // Para el resto de archivos (iconos, json): caché o red
+  // Para los demás archivos (SpaRV.json, iconos, imágenes): Caché primero, red después
   event.respondWith(
     caches.match(event.request).then(response => response || fetch(event.request))
   );
