@@ -2,22 +2,10 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Tu Biblia Digital — Reina-Valera</title>
-
-<!-- PWA & Android Meta Tags -->
-<link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="theme-color" content="#1d6fa4">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Tu Biblia">
-<meta name="description" content="Tu Biblia Digital Reina-Valera completa con lectura offline, búsqueda instantánea, notas, favoritos y síntesis de voz.">
-
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #f5f4f0;
     --surface: #ffffff;
@@ -32,7 +20,6 @@
     --accent-text: #155a87;
     --radius: 8px;
   }
-
   body {
     font-family: 'Georgia', 'Times New Roman', serif;
     background: var(--bg);
@@ -42,128 +29,36 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    overscroll-behavior-y: none;
   }
-
-  body.sidebar-locked {
-    overflow: hidden;
-  }
-
-  /* TOPBAR */
   #topbar {
-    background: #ffffff;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
-    padding: 10px 16px;
-    padding-top: calc(10px + env(safe-area-inset-top, 0px));
+    padding: 12px 20px;
     display: flex;
     align-items: center;
     gap: 10px;
     flex-shrink: 0;
-    z-index: 20;
   }
-
-  #brand {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-  }
-  #brand img {
-    height: 42px;
-    width: auto;
-    max-width: 220px;
-    object-fit: contain;
-    display: block;
-  }
-
-  #topbar span.sub {
-    font-size: 11px;
-    color: var(--text-muted);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    white-space: nowrap;
-    letter-spacing: 0.3px;
-  }
-
+  #topbar h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; color: var(--text); white-space: nowrap; }
+  #topbar span.sub { font-size: 12px; color: var(--text-muted); font-family: sans-serif; white-space: nowrap; }
   #layout {
     display: flex;
     flex: 1;
     overflow: hidden;
-    position: relative;
   }
 
-  /* BOTONES SUPERIORES */
-  .top-btn {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--text-secondary);
-    border-radius: 6px;
-    padding: 6px 10px;
-    cursor: pointer;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: all 0.15s ease;
-  }
-  .top-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .top-btn.pri { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-  #btn-libros { display: none; }
-  #btn-install-pwa { display: none; background: #eaf5ea; border-color: #27ae60; color: #1e7e34; }
-
-  #lang-sel {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--text-secondary);
-    border-radius: 6px;
-    padding: 6px 8px;
-    cursor: pointer;
-  }
-
-  /* OVERLAY / VEIL */
-#sidebar-veil {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    z-index: 90;
-    opacity: 0;
-    transition: opacity 0.25s ease;
-}
-
-  /* SIDEBAR (PANEL DE LIBROS) */
+  /* SIDEBAR */
   #sidebar {
-    width: 250px;
-    min-width: 250px;
-    background: #ffffff;
+    width: 230px;
+    min-width: 230px;
+    background: var(--surface);
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-   z-index: 9999;  }
-
-  #sidebar-mobile-header {
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--border);
-    background: #ffffff;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--text);
   }
-
   #testament-tabs {
     display: flex;
-    background: #ffffff;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
   }
@@ -172,7 +67,7 @@
     padding: 10px 8px;
     font-size: 12px;
     font-weight: 600;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: sans-serif;
     border: none;
     background: transparent;
     cursor: pointer;
@@ -182,54 +77,41 @@
     letter-spacing: 0.3px;
   }
   .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-
   #testament-label {
     padding: 8px 12px 4px;
     font-size: 10px;
-    font-weight: 700;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-weight: 600;
+    font-family: sans-serif;
     color: var(--text-muted);
     letter-spacing: 0.8px;
     text-transform: uppercase;
-    background: #ffffff;
   }
-
-  #books-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 6px 8px 16px;
-    background: #ffffff;
-    -webkit-overflow-scrolling: touch;
-  }
+  #books-list { flex: 1; overflow-y: auto; padding: 4px 6px 12px; }
   .book-item {
-    padding: 8px 12px;
-    font-size: 14px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 7px 10px;
+    font-size: 13px;
+    font-family: sans-serif;
     color: var(--text-secondary);
     cursor: pointer;
     border-radius: 6px;
-    transition: background 0.1s;
-    background: #ffffff;
+    transition: all 0.1s;
   }
   .book-item:hover { background: var(--bg); color: var(--text); }
-  .book-item.active { background: var(--accent-bg); color: var(--accent-text); font-weight: 700; }
+  .book-item.active { background: var(--accent-bg); color: var(--accent-text); font-weight: 600; }
   .book-item.info { cursor: default; color: var(--text-muted); }
   .book-item.info:hover { background: transparent; color: var(--text-muted); }
 
-  /* MAIN CONTENT */
+  /* MAIN */
   #main {
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     background: var(--surface2);
-    min-width: 0;
   }
-
   #content-header {
-    padding: 12px 20px;
+    padding: 14px 20px 10px;
     border-bottom: 1px solid var(--border);
-    background: #ffffff;
     background: var(--surface);
     flex-shrink: 0;
     display: flex;
@@ -238,26 +120,23 @@
     gap: 10px;
   }
   #book-title { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
-  #book-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  #book-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-family: sans-serif; }
 
   #chapter-bar {
     padding: 8px 16px;
     border-bottom: 1px solid var(--border);
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
-    background: #ffffff;
+    gap: 4px;
     background: var(--surface);
     max-height: 90px;
     overflow-y: auto;
     flex-shrink: 0;
-    -webkit-overflow-scrolling: touch;
   }
   .ch-btn {
-    padding: 4px 10px;
+    padding: 3px 9px;
     font-size: 12px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-weight: 600;
+    font-family: sans-serif;
     border: 1px solid var(--border);
     border-radius: 4px;
     background: var(--surface2);
@@ -271,77 +150,133 @@
   #verses-area {
     flex: 1;
     overflow-y: auto;
-    padding: 20px 24px calc(24px + env(safe-area-inset-bottom, 0px));
-    -webkit-overflow-scrolling: touch;
-    background: var(--surface2);
+    padding: 20px 24px calc(20px + env(safe-area-inset-bottom, 0px));
   }
   .verse-row {
     display: flex;
     gap: 10px;
-    padding: 7px 10px;
+    padding: 6px 8px;
     cursor: pointer;
     border-radius: 6px;
     transition: background 0.1s;
   }
   .verse-row:hover { background: #eef3f8; }
   .verse-row.selected { background: var(--accent-bg); }
-  .verse-row.leyendo { background: #fff4d6; }
   .v-num {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: sans-serif;
     color: var(--text-muted);
-    min-width: 24px;
-    padding-top: 3px;
+    min-width: 22px;
+    padding-top: 4px;
     text-align: right;
     flex-shrink: 0;
   }
   .v-text {
-    font-size: 16px;
+    font-size: 15px;
     color: var(--text);
     line-height: 1.75;
     letter-spacing: 0.1px;
-    flex: 1;
-    user-select: text;
   }
-  .v-mark { font-size: 12px; padding-top: 3px; flex-shrink: 0; white-space: nowrap; }
+  .v-mark { font-size: 12px; padding-top: 4px; flex-shrink: 0; white-space: nowrap; }
 
-  /* ESTADOS (VACÍO, CARGA, ERROR) */
-  #empty-state, #loading-state, #error-state {
+  /* EMPTY / LOADING / ERROR */
+  #empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100%;
     gap: 12px;
-    padding: 30px;
+    color: var(--text-muted);
+    font-family: sans-serif;
     text-align: center;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 40px;
   }
-  #empty-state { color: var(--text-muted); }
   #empty-state .big-icon { font-size: 48px; }
   #empty-state p { font-size: 14px; max-width: 320px; line-height: 1.5; }
-  #loading-state { display: none; color: var(--text-secondary); font-size: 13px; }
-  #error-state { display: none; color: #c0392b; font-size: 14px; line-height: 1.6; }
+  #loading-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 10px;
+    font-family: sans-serif;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  #error-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 8px;
+    padding: 30px 20px;
+    text-align: center;
+    font-family: sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #c0392b;
+  }
   #error-state .err-icon { font-size: 36px; }
   #error-msg { font-size: 13px; color: var(--text-secondary); max-width: 460px; }
   #error-state .err-acciones { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+  #error-state label.top-btn { display: inline-block; }
   .spinner {
-    width: 30px; height: 30px;
-    border: 2.5px solid var(--border);
+    width: 28px; height: 28px;
+    border: 2px solid var(--border);
     border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 0.7s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+  #books-list::-webkit-scrollbar, #verses-area::-webkit-scrollbar, #chapter-bar::-webkit-scrollbar, #busqueda-resultados::-webkit-scrollbar { width: 4px; height: 4px; }
+  #books-list::-webkit-scrollbar-thumb, #verses-area::-webkit-scrollbar-thumb, #chapter-bar::-webkit-scrollbar-thumb, #busqueda-resultados::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
 
-  /* BARRA FLOTANTE DE ACCIONES POR VERSÍCULO */
+  .top-btn {
+    font-family: sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .top-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .top-btn.pri { background: var(--accent); color: #fff; border-color: var(--accent); }
+  #btn-libros { display: none; }
+  #sidebar-veil { display: none; }
+
+  #lang-sel {
+    font-family: sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    padding: 6px 8px;
+    cursor: pointer;
+  }
+
+  #btn-leer-cap { flex-shrink: 0; margin-top: 2px; }
+  #btn-leer-cap.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .verse-row.leyendo { background: #fff4d6; }
+
   #acciones-v {
     position: fixed;
     left: 50%;
     bottom: calc(18px + env(safe-area-inset-bottom, 0px));
     transform: translateX(-50%);
-    z-index: 110;
+    z-index: 60;
     background: #1a1917;
     color: #fff;
     border-radius: 14px;
@@ -350,8 +285,8 @@
     gap: 6px;
     flex-wrap: wrap;
     justify-content: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,.35);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    box-shadow: 0 10px 30px rgba(0,0,0,.3);
+    font-family: sans-serif;
     max-width: 94vw;
   }
   #acciones-v.open { display: flex; }
@@ -359,7 +294,7 @@
     border: 0;
     border-radius: 10px;
     padding: 10px 14px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     background: #2e2d2a;
@@ -369,49 +304,25 @@
   #acciones-v button.pri { background: var(--accent); }
 
   /* MODALES */
-  #modal, #modal-buscar {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 120;
-    background: rgba(0,0,0,.45);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-  }
+  #modal, #modal-buscar { display: none; position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 16px; }
   #modal.open, #modal-buscar.open { display: flex; }
-  #modal-box, #modal-buscar-box {
-    background: #ffffff;
-    background: var(--surface);
-    border-radius: 12px;
-    width: 100%;
-    max-width: 560px;
-    max-height: 86vh;
-    max-height: 86dvh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgba(0,0,0,.35);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
+  #modal-box, #modal-buscar-box { background: var(--surface); border-radius: 12px; width: 100%; max-width: 560px; max-height: 86vh; max-height: 86dvh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,.35); font-family: sans-serif; }
   #modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
   #modal-title { font-size: 16px; font-weight: 700; color: var(--text); }
-  #modal-body { padding: 12px 16px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
+  #modal-body { padding: 12px 16px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
   #modal-body .item { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; background: var(--surface2); display: flex; flex-direction: column; gap: 6px; }
   #modal-body .ref { font-size: 12px; font-weight: 700; color: var(--accent-text); }
-  #modal-body .txt { font-family: 'Georgia', serif; font-size: 14px; line-height: 1.55; color: var(--text); white-space: pre-wrap; }
+  #modal-body .txt { font-family: Georgia, serif; font-size: 14px; line-height: 1.55; color: var(--text); white-space: pre-wrap; }
   #modal-body .nota { font-size: 13px; line-height: 1.5; color: var(--text-secondary); background: #fff8e1; border-radius: 6px; padding: 8px 10px; white-space: pre-wrap; }
   #modal-body .acc { display: flex; gap: 8px; flex-wrap: wrap; }
   #modal-body .vacio { font-size: 13px; color: var(--text-muted); text-align: center; padding: 24px 8px; line-height: 1.5; }
   #modal-body .cita { font-style: italic; color: var(--text-secondary); }
-  #nota-input { width: 100%; min-height: 130px; resize: vertical; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); outline: none; }
+  #nota-input { width: 100%; min-height: 130px; resize: vertical; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; font-size: 15px; font-family: sans-serif; background: var(--bg); color: var(--text); outline: none; }
   #nota-input:focus { border-color: var(--accent); }
 
-  /* MODAL BÚSQUEDA */
+  /* MODAL DE BÚSQUEDA GLOBAL */
   #modal-buscar-box { max-width: 640px; height: 86vh; height: 86dvh; }
-  #busqueda-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); background: #ffffff; }
+  #busqueda-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
   #busqueda-input-wrap {
     flex: 1;
     display: flex;
@@ -423,82 +334,77 @@
     padding: 6px 12px;
   }
   #busqueda-input-wrap:focus-within { border-color: var(--accent); }
-  #busqueda-input { flex: 1; border: none; background: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 15px; color: var(--text); outline: none; }
-  #btn-limpiar-busq { border: none; background: transparent; color: var(--text-muted); font-size: 13px; cursor: pointer; padding: 2px 4px; display: none; }
+  #busqueda-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+  }
+  #btn-limpiar-busq {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 2px 4px;
+    display: none;
+  }
   #btn-limpiar-busq.show { display: block; }
-  #busqueda-info { font-size: 12px; color: var(--text-muted); padding: 8px 16px; border-bottom: 1px solid var(--border); background: var(--surface2); }
-  #busqueda-resultados { flex: 1; overflow-y: auto; padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch; }
-  .res-item { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; background: var(--surface2); cursor: pointer; transition: background 0.1s, border-color 0.1s; display: flex; flex-direction: column; gap: 4px; text-align: left; }
+  #busqueda-info {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+    font-family: sans-serif;
+  }
+  #busqueda-resultados {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .res-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: var(--surface2);
+    cursor: pointer;
+    transition: background 0.1s, border-color 0.1s;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+  }
   .res-item:hover { background: #eef3f8; border-color: var(--accent); }
-  .res-item .ref { font-size: 12px; font-weight: 700; color: var(--accent-text); }
-  .res-item .txt { font-family: 'Georgia', serif; font-size: 14px; line-height: 1.55; color: var(--text); }
+  .res-item .ref { font-size: 12px; font-weight: 700; color: var(--accent-text); font-family: sans-serif; }
+  .res-item .txt { font-family: Georgia, serif; font-size: 14px; line-height: 1.55; color: var(--text); }
   mark.hl { background: #ffe082; color: inherit; padding: 0 1px; border-radius: 2px; }
 
-  /* TOAST NOTIFICACIÓN */
-  #toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: #1a1917; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; padding: 9px 16px; border-radius: 10px; z-index: 130; opacity: 0; pointer-events: none; transition: opacity .2s; max-width: 90vw; text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
-  #toast.show { opacity: 1; }
-
-  /* =====================================================================
-     ADAPTACIÓN MÓVIL PROFESIONAL (ANDROID / IOS)
-     ===================================================================== */
   @media (max-width: 760px) {
-    #topbar { padding: 8px 10px; gap: 6px; }
+    #topbar { padding: 10px 12px; gap: 6px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+    #topbar h1 { font-size: 15px; flex: 1; overflow: hidden; text-overflow: ellipsis; }
     #topbar span.sub { display: none; }
     .bt { display: none; }
     #btn-libros { display: inline-flex; }
-
-    #brand img {
-      height: 34px;
-      max-width: 150px;
-    }
-
-    #sidebar-mobile-header { display: flex; }
-
-    /* SIDEBAR COMPLETO TIPO APP NATIVA */
-    #sidebar {
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      width: 84%;
-      max-width: 320px;
-      min-width: 0;
-      height: 100vh;
-      height: 100dvh;
-      background: #ffffff !important;
-
-      z-index: 10000;
-
-      opacity: 1 !important;
-      visibility: visible !important;
-      isolation: isolate;
-
-      box-shadow: 6px 0 28px rgba(0, 0, 0, 0.3);
-      transform: translateX(-105%);
-      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      padding-top: env(safe-area-inset-top, 0px);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-    .book-item {
-      padding: 11px 14px;
-      font-size: 15px;
-      background: #ffffff;
-    }
-    .tab-btn {
-      padding: 12px 8px;
-      font-size: 13px;
-    }
-
-    #content-header { padding: 10px 14px 8px; }
+    #layout { position: relative; }
+    #sidebar { position: absolute; z-index: 30; top: 0; bottom: 0; left: 0; width: 82%; max-width: 300px; min-width: 0; transform: translateX(-102%); transition: transform .2s; box-shadow: 4px 0 24px rgba(0,0,0,.15); }
+    #sidebar.open { transform: none; }
+    #sidebar-veil.open { display: block; position: absolute; inset: 0; z-index: 25; background: rgba(0,0,0,.3); }
+    .book-item { padding: 10px 12px; font-size: 15px; }
+    .tab-btn { padding: 12px 6px; font-size: 13px; }
+    #content-header { padding: 12px 14px 8px; }
     #book-title { font-size: 19px; }
     #chapter-bar { padding: 8px 12px; max-height: 96px; }
     .ch-btn { padding: 6px 11px; font-size: 13px; }
     #verses-area { padding: 12px 10px calc(84px + env(safe-area-inset-bottom, 0px)); }
     .v-text { font-size: 17px; }
-
-    #lang-sel { max-width: 82px; padding: 4px 6px; font-size: 11px; }
-
+    #lang-sel { max-width: 86px; padding: 5px; }
     #modal-buscar { padding: 8px; }
     #modal-buscar-box { max-height: 96vh; max-height: 96dvh; border-radius: 10px; }
     #busqueda-head { padding: 10px 12px; gap: 8px; }
@@ -508,30 +414,29 @@
   }
 
   @media (max-width: 380px) {
-    #topbar { gap: 4px; padding-left: 6px; padding-right: 6px; }
-    #brand img { height: 30px; max-width: 120px; }
+    #topbar { gap: 4px; padding-left: 8px; padding-right: 8px; }
+    #topbar h1 { font-size: 13px; }
   }
+
+  #toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: #1a1917; color: #fff; font-family: sans-serif; font-size: 13px; padding: 9px 14px; border-radius: 10px; z-index: 90; opacity: 0; pointer-events: none; transition: opacity .2s; max-width: 90vw; text-align: center; }
+  #toast.show { opacity: 1; }
 </style>
 </head>
 <body>
 
 <div id="topbar">
-  <button class="top-btn" id="btn-libros" onclick="toggleLibros()" aria-label="Abrir lista de libros">📖<span class="bt" id="lbl-libros-top"> Libros</span></button>
+  <button class="top-btn" id="btn-libros" onclick="toggleLibros()" aria-label="Libros">📖<span class="bt" id="lbl-libros-top"> Libros</span></button>
   <div id="brand">
-    <img src="Tú_Biblia_Digital_logo_design_68386b2e_2K.jpg" alt="Tu Biblia Digital">
-    <span id="topbar-h1" style="display:none;"></span>
-  </div>
-  <span class="sub" id="topbar-sub">Antiguo y Nuevo Testamento · Reina-Valera (SpaRV)</span>
-
-  <button class="top-btn" id="btn-install-pwa" onclick="instalarPwa()" aria-label="Instalar aplicación" style="margin-left:auto;">📲<span class="bt"> Instalar</span></button>
-
-  <select id="lang-sel" aria-label="Idioma y voz" onchange="cambiarIdioma(this.value)">
+  <img src="Tú_Biblia_Digital_logo_design_68386b2e_2K.jpg" alt="Tu Biblia Digital" style="height: 90px; width: auto; object-fit: contain; display: block;">
+  <span id="topbar-h1" style="display:none;"></span>
+</div>
+  <span class="sub" id="topbar-sub">ANTIGUO TESTAMENTO Y NUEVO TESTAMENTO</span>
+  <select id="lang-sel" style="margin-left:auto" aria-label="Idioma y voz" onchange="cambiarIdioma(this.value)">
     <option value="es-419">🌎 LatAm</option>
     <option value="es-ES">🇪🇸 España</option>
     <option value="en">🇬🇧 English</option>
     <option value="pt">🇵🇹 Português</option>
   </select>
-
   <button class="top-btn" onclick="abrirBuscador()" aria-label="Buscar en la Biblia">🔍<span class="bt" id="lbl-buscar"> Buscar</span></button>
   <button class="top-btn" onclick="abrirFavoritos()" aria-label="Favoritos">⭐<span class="bt" id="lbl-favs"> Favoritos</span></button>
   <button class="top-btn" onclick="abrirNotas()" aria-label="Notas">📝<span class="bt" id="lbl-notas"> Notas</span></button>
@@ -539,11 +444,7 @@
 
 <div id="layout">
   <div id="sidebar-veil" onclick="toggleLibros(false)"></div>
-  <div id="sidebar" role="navigation" aria-label="Libros de la Biblia">
-    <div id="sidebar-mobile-header">
-      <span>📖 Libros de la Biblia</span>
-      <button class="top-btn" onclick="toggleLibros(false)" aria-label="Cerrar panel">✕</button>
-    </div>
+  <div id="sidebar">
     <div id="testament-tabs">
       <button class="tab-btn active" id="tab-at" onclick="switchTestament('at')">Antiguo Testamento</button>
       <button class="tab-btn" id="tab-nt" onclick="switchTestament('nt')">Nuevo Testamento</button>
@@ -552,7 +453,7 @@
     <div id="books-list"></div>
   </div>
 
-  <main id="main">
+  <div id="main">
     <div id="content-header">
       <div>
         <div id="book-title">Selecciona un libro</div>
@@ -582,7 +483,7 @@
         </div>
       </div>
     </div>
-  </main>
+  </div>
 </div>
 
 <div id="acciones-v" role="dialog" aria-label="Opciones del versículo">
@@ -592,7 +493,7 @@
   <button onclick="cerrarAcciones()" aria-label="Cerrar">✕</button>
 </div>
 
-<!-- MODAL BÚSQUEDA GLOBAL -->
+<!-- MODAL DE BÚSQUEDA GLOBAL -->
 <div id="modal-buscar" role="dialog" aria-modal="true" onclick="if(event.target===this)cerrarBuscador()">
   <div id="modal-buscar-box">
     <div id="busqueda-head">
@@ -622,22 +523,22 @@
 'use strict';
 
 // =====================================================================
-//  Tu Biblia Digital — Reina-Valera (SpaRV)
+//  Tu Biblia Digital
 // =====================================================================
 
-const TOTAL_LIBROS = 66;
-const N_AT = 39;
+const TOTAL_LIBROS = 66;               // 39 del Antiguo + 27 del Nuevo Testamento
+const N_AT = 39;                       // los libros 0..38 son el Antiguo Testamento
 const RUTAS_BIBLIA = ['/SpaRV.json', 'SpaRV.json'];
 
 let currentTestament = 'at';
-let currentBook = null;
-let currentChapter = 1;
+let currentBook = null;                // índice del libro dentro de data.books (0..65)
+let currentChapter = 1;                // número de capítulo (1..n)
 let cargaId = 0;
 
 const $ = id => document.getElementById(id);
 
 // =====================================================================
-// DICCIONARIOS INTERNACIONALIZADOS (66 LIBROS + VARIANTES CANÓNICAS)
+// DICCIONARIOS DE INTERNACIONALIZACIÓN DE LIBROS (66 LIBROS + VARIANTES)
 // =====================================================================
 
 const BOOKS_ES = {
@@ -729,8 +630,8 @@ const DICCIONARIOS_LIBROS = {
 
 const UI_TEXTS = {
   'es': {
-    tituloApp: 'Tu Biblia Digital',
-    subtituloApp: 'Antiguo y Nuevo Testamento · Reina-Valera (SpaRV)',
+    tituloApp: '✦ Tu Biblia Digital',
+    subtituloApp: 'Antiguo y Nuevo Testamento',
     at: 'Antiguo Testamento', nt: 'Nuevo Testamento',
     atCount: 'Antiguo Testamento — 39 libros', ntCount: 'Nuevo Testamento — 27 libros',
     libros: 'Libros', seleccionarLibro: 'Selecciona un libro',
@@ -750,12 +651,11 @@ const UI_TEXTS = {
     cargandoBiblia: 'Cargando la Biblia...', cargandoVersos: 'Cargando versículos...',
     errCarga: 'No se pudo cargar la Biblia (SpaRV.json).', reintentar: 'Reintentar',
     seleccionarArchivo: 'Seleccionar SpaRV.json', notaGuardada: '📝 Nota guardada',
-    notaEliminada: 'Nota eliminada', favAgregado: '⭐ Añadido a favoritos', favQuitado: 'Quitado de favoritos',
-    instalar: 'Instalar'
+    notaEliminada: 'Nota eliminada', favAgregado: '⭐ Añadido a favoritos', favQuitado: 'Quitado de favoritos'
   },
   'en': {
-    tituloApp: 'Your Digital Bible',
-    subtituloApp: 'Old and New Testament · Reina-Valera (SpaRV)',
+    tituloApp: '✦ Your Digital Bible',
+    subtituloApp: 'Old and New Testament',
     at: 'Old Testament', nt: 'New Testament',
     atCount: 'Old Testament — 39 books', ntCount: 'New Testament — 27 books',
     libros: 'Books', seleccionarLibro: 'Select a book',
@@ -775,12 +675,11 @@ const UI_TEXTS = {
     cargandoBiblia: 'Loading Bible...', cargandoVersos: 'Loading verses...',
     errCarga: 'Could not load Bible file (SpaRV.json).', reintentar: 'Retry',
     seleccionarArchivo: 'Select SpaRV.json', notaGuardada: '📝 Note saved',
-    notaEliminada: 'Note deleted', favAgregado: '⭐ Added to favorites', favQuitado: 'Removed from favorites',
-    instalar: 'Install'
+    notaEliminada: 'Note deleted', favAgregado: '⭐ Added to favorites', favQuitado: 'Removed from favorites'
   },
   'pt': {
-    tituloApp: 'Sua Bíblia Digital',
-    subtituloApp: 'Antigo e Novo Testamento · Reina-Valera (SpaRV)',
+    tituloApp: '✦ Sua Bíblia Digital',
+    subtituloApp: 'Antigo e Novo Testamento',
     at: 'Antigo Testamento', nt: 'Novo Testamento',
     atCount: 'Antigo Testamento — 39 livros', ntCount: 'Novo Testamento — 27 livros',
     libros: 'Livros', seleccionarLibro: 'Selecione um livro',
@@ -800,8 +699,7 @@ const UI_TEXTS = {
     cargandoBiblia: 'Carregando a Bíblia...', cargandoVersos: 'Carregando versículos...',
     errCarga: 'Não foi possível carregar a Bíblia (SpaRV.json).', reintentar: 'Tentar novamente',
     seleccionarArchivo: 'Selecionar SpaRV.json', notaGuardada: '📝 Nota salva',
-    notaEliminada: 'Nota excluída', favAgregado: '⭐ Adicionado aos favoritos', favQuitado: 'Removido dos favoritos',
-    instalar: 'Instalar'
+    notaEliminada: 'Nota excluída', favAgregado: '⭐ Adicionado aos favoritos', favQuitado: 'Removido dos favoritos'
   }
 };
 
@@ -852,8 +750,8 @@ function tUi(k, params) {
 }
 
 function actualizarTextosUI() {
-  const h1 = $('topbar-h1'); if (h1) h1.textContent = tUi('tituloApp');
-  const sub = $('topbar-sub'); if (sub) sub.textContent = tUi('subtituloApp');
+  $('topbar-h1').textContent = tUi('tituloApp');
+  $('topbar-sub').textContent = tUi('subtituloApp');
 
   const tabAt = $('tab-at'); if (tabAt) tabAt.textContent = tUi('at');
   const tabNt = $('tab-nt'); if (tabNt) tabNt.textContent = tUi('nt');
@@ -919,7 +817,7 @@ function cambiarIdioma(v) {
   }
 }
 
-// ---------- LOCAL STORAGE ----------
+// ---------- ALMACÉN LOCAL (favoritos y notas) ----------
 function lsGet(k, def) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch (e) { return def; } }
 function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 let favs = lsGet('biblia_favs', []);
@@ -934,7 +832,7 @@ function toast(msg) {
   clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 1800);
 }
 
-// ---------- CARGA DE SpaRV.json ----------
+// ---------- CARGA Y VALIDACIÓN DE SpaRV.json ----------
 let BIBLIA = null;
 let bibliaPromesa = null;
 let ultimoErrorCarga = '';
@@ -958,6 +856,12 @@ function validarBiblia(data) {
       if (!cap || cap.chapter !== j + 1 || !Array.isArray(cap.verses) || !cap.verses.length) {
         throw new Error(`El libro «${libro.name}», capítulo ${j + 1}, no tiene el formato esperado.`);
       }
+      for (let k = 0; k < cap.verses.length; k++) {
+        const v = cap.verses[k];
+        if (!v || !Number.isInteger(v.verse) || v.verse < 1 || typeof v.text !== 'string') {
+          throw new Error(`«${libro.name}» ${cap.chapter}: el versículo n.º ${k + 1} no tiene formato válido.`);
+        }
+      }
     });
   });
   return libros;
@@ -969,7 +873,7 @@ function parseBiblia(texto) {
   return validarBiblia(data);
 }
 async function descargarBiblia() {
-  let errContenido = null, estado = 'sin respuesta';
+  let errContenido = null, estado = 'sin respuesta del servidor';
   for (const ruta of RUTAS_BIBLIA) {
     let r;
     try { r = await fetch(ruta); } catch (e) { estado = 'sin respuesta'; continue; }
@@ -1040,16 +944,7 @@ function mostrarEstadoInicial() {
   else showLoading();
 }
 
-// ---------- CONTROL DEL SIDEBAR (MÓVIL Y ESCRITORIO) ----------
-function toggleLibros(abrir) {
-  const sb = $('sidebar'), v = $('sidebar-veil');
-  const on = abrir === undefined ? !sb.classList.contains('open') : Boolean(abrir);
-  sb.classList.toggle('open', on);
-  v.classList.toggle('open', on);
-  document.body.classList.toggle('sidebar-locked', on && window.innerWidth <= 760);
-}
-
-// ---------- NAVEGACIÓN Y LIBROS ----------
+// ---------- NAVEGACIÓN ----------
 function switchTestament(t, keep) {
   currentTestament = t;
   document.querySelectorAll('.tab-btn').forEach((b, i) =>
@@ -1118,7 +1013,13 @@ function selectChapter(n) {
   return loadChapter(currentBook, n);
 }
 
-// ---------- CARGA DE CAPÍTULOS Y VERSÍCULOS ----------
+function toggleLibros(abrir) {
+  const sb = $('sidebar'), v = $('sidebar-veil');
+  const on = abrir === undefined ? !sb.classList.contains('open') : abrir;
+  sb.classList.toggle('open', on); v.classList.toggle('open', on);
+}
+
+// ---------- CAPÍTULOS Y VERSÍCULOS ----------
 async function loadChapter(gi, chapter) {
   const id = ++cargaId;
   document.querySelectorAll('.verse-row').forEach(r => r.remove());
@@ -1174,10 +1075,6 @@ let locucionActual = null;
 
 function hayVoz() { return 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined'; }
 
-if (hayVoz() && speechSynthesis.onvoiceschanged !== undefined) {
-  speechSynthesis.onvoiceschanged = () => {};
-}
-
 function vozPara(lang) {
   const vs = (hayVoz() && speechSynthesis.getVoices()) || [];
   const norm = x => (x.lang || '').replace('_', '-').toLowerCase();
@@ -1191,7 +1088,7 @@ function vozPara(lang) {
 }
 
 function hablar(texto, id, alTerminar, retraso) {
-  if (!hayVoz()) { pararLectura(); toast('Este dispositivo no soporta lectura en voz alta.'); return; }
+  if (!hayVoz()) { pararLectura(); toast('Este navegador no puede leer en voz alta.'); return; }
   if (id !== lecturaId) return;
   const u = new SpeechSynthesisUtterance(texto);
   const v = vozPara(idioma);
@@ -1248,7 +1145,7 @@ function toggleLeerCapitulo() {
   leerDesde(sel ? filas.indexOf(sel) : 0, id, 50);
 }
 
-// ---------- MENÚ ACCIONES VERSÍCULO ----------
+// ---------- MENÚ DE ACCIONES POR VERSÍCULO ----------
 let versoSel = null;
 function abrirAcciones(v, bookName, chapter, row, gi) {
   versoSel = { v, bookName, chapter, row, gi };
@@ -1562,7 +1459,7 @@ function realizarBusqueda(query) {
   res.scrollTop = 0;
 }
 
-// ---------- NAVEGACIÓN DIRECTA ----------
+// ---------- IR A UNA CITA ----------
 async function irA(gi, cap, n) {
   cerrarModal(); pararLectura();
   try { await cargarBiblia(); }
@@ -1578,41 +1475,10 @@ async function irA(gi, cap, n) {
   }
 }
 
-// ---------- GESTOR DE INSTALACIÓN PWA ----------
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const btnInstall = $('btn-install-pwa');
-  if (btnInstall) btnInstall.style.display = 'inline-flex';
-});
-
-window.addEventListener('appinstalled', () => {
-  deferredPrompt = null;
-  const btnInstall = $('btn-install-pwa');
-  if (btnInstall) btnInstall.style.display = 'none';
-  toast('¡App instalada correctamente!');
-});
-
-async function instalarPwa() {
-  if (!deferredPrompt) {
-    toast('Para instalar: usa el menú de tu navegador ⋮ y pulsa «Instalar aplicación»');
-    return;
-  }
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  if (outcome === 'accepted') {
-    const btnInstall = $('btn-install-pwa');
-    if (btnInstall) btnInstall.style.display = 'none';
-  }
-  deferredPrompt = null;
-}
-
-// ---------- ATAJOS TECLADO ----------
+// ---------- ATAJOS DE TECLADO ----------
 window.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    if ($('sidebar').classList.contains('open')) toggleLibros(false);
-    else if ($('modal-buscar').classList.contains('open')) cerrarBuscador();
+    if ($('modal-buscar').classList.contains('open')) cerrarBuscador();
     else if ($('modal').classList.contains('open')) cerrarModal();
     else if ($('acciones-v').classList.contains('open')) cerrarAcciones();
   }
@@ -1627,14 +1493,6 @@ $('lang-sel').value = idioma;
 actualizarTextosUI();
 switchTestament('at');
 cargarBiblia().then(alCargarBiblia).catch(e => mostrarErrorCarga(e.message));
-
-// REGISTRO DEL SERVICE WORKER
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js', { scope: '/' })
-      .catch(err => console.warn('PWA SW no registrado:', err));
-  });
-}
 </script>
 </body>
 </html>
