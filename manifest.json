@@ -2,11 +2,9 @@
   "id": "/",
   "name": "Tu Biblia Digital",
   "short_name": "Biblia",
-  "description": "Biblia Digital Reina-Valera con lectura sin conexión",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
   "background_color": "#f5f4f0",
   "theme_color": "#1d6fa4",
   "icons": [
