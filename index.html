@@ -66,12 +66,11 @@ if ('serviceWorker' in navigator) {
     flex-shrink: 0;
   }
 #brand img {
-    height: 177.5px;
     width: 710px;
-    max-width: 100%;
+    height: 177.5px;
+    max-width: min(710px, 48vw);
     object-fit: contain;
     object-position: left center;
-    display: block;
 }
   #topbar span.sub {
     font-size: 14px;
@@ -585,7 +584,12 @@ if ('serviceWorker' in navigator) {
     border-bottom: 1px solid #766344;
     box-shadow: 0 4px 24px rgba(0,0,0,.22);
   }
-  #brand img { height: 92px; max-width: min(280px, 34vw); }
+  #brand img {
+    width: 220px;
+    height: 76px;
+    max-width: 45vw;
+    object-fit: contain;
+}
   #topbar span.sub { color: #D8C9B2; }
   #sidebar, #testament-tabs, #testament-label, #books-list {
     background: #172A30 !important;
