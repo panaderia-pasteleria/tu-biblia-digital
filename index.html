@@ -1540,6 +1540,7 @@ $('btn-exportar-datos').onclick = () => {
 
 };
 
+
 $('btn-importar-datos').onclick = () => {
   const selector = document.createElement('input');
   selector.type = 'file';
@@ -1554,8 +1555,7 @@ $('btn-importar-datos').onclick = () => {
         throw new Error('El archivo supera los 10 MB.');
       }
 
-      const contenido = await archivo.text();
-      const copia = JSON.parse(contenido);
+      const copia = JSON.parse(await archivo.text());
 
       if (
         !copia ||
@@ -1566,13 +1566,114 @@ $('btn-importar-datos').onclick = () => {
         typeof copia.notas !== 'object' ||
         Array.isArray(copia.notas)
       ) {
-        throw new Error('El archivo no tiene el formato esperado.');
+        throw new Error('Formato de copia no válido.');
       }
 
-      toast('Archivo reconocido. Pendiente de restauración.');
+      const claveValida = k =>
+        typeof k === 'string' &&
+        /^(?:[0-9]|[1-5][0-9]|6[0-5]):[1-9][0-9]*:[1-9][0-9]*$/.test(k);
+
+      const favoritoValido = f =>
+        f && typeof f === 'object' &&
+        !Array.isArray(f) &&
+        claveValida(f.k) &&
+        Number.isInteger(f.gi) &&
+        Number.isInteger(f.c) &&
+        Number.isInteger(f.n) &&
+        f.k === `${f.gi}:${f.c}:${f.n}` &&
+        typeof f.bn === 'string' &&
+        typeof f.t === 'string';
+
+      const notaValida = (k, n) =>
+        claveValida(k) &&
+        n && typeof n === 'object' &&
+        !Array.isArray(n) &&
+        Number.isInteger(n.gi) &&
+        Number.isInteger(n.c) &&
+        Number.isInteger(n.n) &&
+        k === `${n.gi}:${n.c}:${n.n}` &&
+        typeof n.bn === 'string' &&
+        typeof n.t === 'string' &&
+        typeof n.nota === 'string';
+
+      if (
+        !copia.favoritos.every(favoritoValido) ||
+        !Object.entries(copia.notas)
+          .every(([k, n]) => notaValida(k, n))
+      ) {
+        throw new Error('La copia contiene datos incorrectos.');
+      }
+
+      const favoritosActuales = new Set(favs.map(f => f.k));
+      const nuevosFavoritos = copia.favoritos.filter(f => {
+        if (favoritosActuales.has(f.k)) return false;
+        favoritosActuales.add(f.k);
+        return true;
+      });
+
+      const nuevasNotas = Object.entries(copia.notas)
+        .filter(([k]) =>
+          !Object.prototype.hasOwnProperty.call(notas, k)
+        );
+
+      const mensaje =
+        `Se añadirán ${nuevosFavoritos.length} favoritos ` +
+        `y ${nuevasNotas.length} notas.\n\n` +
+        'Los datos actuales se conservarán.\n\n' +
+        '¿Deseas continuar?';
+
+      if (!confirm(mensaje)) return;
+
+      const favoritosCombinados = [...favs, ...nuevosFavoritos];
+      const notasCombinadas = Object.assign(
+        Object.create(null),
+        notas,
+        Object.fromEntries(nuevasNotas)
+      );
+
+      const anterioresFav = localStorage.getItem('biblia_favs');
+      const anterioresNotas = localStorage.getItem('biblia_notas');
+
+      try {
+        localStorage.setItem(
+          'biblia_favs',
+          JSON.stringify(favoritosCombinados)
+        );
+        localStorage.setItem(
+          'biblia_notas',
+          JSON.stringify(notasCombinadas)
+        );
+      } catch (error) {
+        try {
+          if (anterioresFav === null) {
+            localStorage.removeItem('biblia_favs');
+          } else {
+            localStorage.setItem('biblia_favs', anterioresFav);
+          }
+
+          if (anterioresNotas === null) {
+            localStorage.removeItem('biblia_notas');
+          } else {
+            localStorage.setItem('biblia_notas', anterioresNotas);
+          }
+        } catch (errorRestauracion) {
+          console.error('Error al revertir:', errorRestauracion);
+        }
+
+        throw new Error('No se pudieron guardar los datos.');
+      }
+
+      favs = favoritosCombinados;
+      notas = notasCombinadas;
+
+      refrescarTodasMarcas();
+      abrirCopiasSeguridad();
+
+      toast('Favoritos y notas restaurados correctamente.');
+
     } catch (error) {
-      console.error('Error al leer la copia:', error);
-      toast('Archivo no válido: ' + error.message);
+      console.error('Error de restauración:', error);
+      toast('Error: ' + error.message);
     }
   };
 
