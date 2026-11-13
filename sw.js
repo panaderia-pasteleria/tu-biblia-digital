@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tu-biblia-digital-v4';
+const CACHE_NAME = 'tu-biblia-digital-v5';
 const CACHE_PREFIX = 'tu-biblia-digital-';
 
 const FILES_TO_CACHE = [
