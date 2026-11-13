@@ -1539,10 +1539,46 @@ $('btn-exportar-datos').onclick = () => {
   }
 };
 
-  $('btn-importar-datos').onclick = () => {
-    toast('Próximamente: restauración');
+ 
+$('btn-importar-datos').onclick = () => {
+  const selector = document.createElement('input');
+  selector.type = 'file';
+  selector.accept = '.json,application/json';
+
+  selector.onchange = async () => {
+    const archivo = selector.files[0];
+    if (!archivo) return;
+
+    try {
+      if (archivo.size > 10 * 1024 * 1024) {
+        throw new Error('El archivo supera los 10 MB.');
+      }
+
+      const contenido = await archivo.text();
+      const copia = JSON.parse(contenido);
+
+      if (
+        !copia ||
+        copia.aplicacion !== 'Tu Biblia Digital' ||
+        copia.version !== 1 ||
+        !Array.isArray(copia.favoritos) ||
+        !copia.notas ||
+        typeof copia.notas !== 'object' ||
+        Array.isArray(copia.notas)
+      ) {
+        throw new Error('El archivo no tiene el formato esperado.');
+      }
+
+      toast('Archivo reconocido. Pendiente de restauración.');
+    } catch (error) {
+      console.error('Error al leer la copia:', error);
+      toast('Archivo no válido: ' + error.message);
+    }
   };
-}
+
+  selector.click();
+};
+
 
 function abrirFavoritos() {
   cerrarAcciones();
