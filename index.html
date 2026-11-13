@@ -1596,7 +1596,7 @@ function alCargarBiblia() {
   if (p && BIBLIA && BIBLIA[p.gi] &&
       ((BIBLIA[p.gi].chapters[p.cap - 1] && (esLibroCatolico(p.gi) || BIBLIA[p.gi].chapters[p.cap - 1].verses.some(v => v.verse === p.n))) ||
         (p.gi in EXTRA_ANTIGUO && p.cap <= EXTRA_ANTIGUO[p.gi].total && lenguaActualCatolica() !== 'es'))) {
-    switchTestament(p.esAntiguoTestamento(gi) ? 'at' : 'nt', true);
+    switchTestament(esAntiguoTestamento(p.gi) ? 'at' : 'nt', true);
     renderBooks();
     selectBook(p.gi, p.cap);
   } else {
