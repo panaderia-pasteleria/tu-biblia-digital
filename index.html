@@ -831,6 +831,7 @@ if ('serviceWorker' in navigator) {
   
 const TOTAL_LIBROS = 66;
 const N_AT = 39;
+const TOTAL_CANON_CATOLICO = 73;
 const RUTAS_BIBLIA = ['/SpaRV.json', 'SpaRV.json'];
 const BIBLIAS_INCLUIDAS = { en: 'biblia-texto-en', pt: 'biblia-texto-pt' };
 const CACHE_BIBLIAS = Object.create(null);
@@ -949,6 +950,182 @@ const BOOKS_LA = {
   'Revelation':'Apocalypsis'
 };
 
+// Los libros nuevos conservan índices 66–72; los 66 anteriores NO cambian.
+const CATOLICOS = [
+  {name:'Tobit',es:'Tobías',en:'Tobias',pt:'Tobias',la:'Tobias',chapters:14,stem:'17-tob',ptid:'TOB'},
+  {name:'Judith',es:'Judit',en:'Judith',pt:'Judite',la:'Judith',chapters:16,stem:'18-jdt',ptid:'JDT'},
+  {name:'Wisdom',es:'Sabiduría',en:'Wisdom',pt:'Sabedoria',la:'Sapientia',chapters:19,stem:'27-sab',ptid:'WIS'},
+  {name:'Sirach',es:'Eclesiástico',en:'Ecclesiasticus',pt:'Eclesiástico',la:'Ecclesiasticus',chapters:51,stem:'28-eclo',ptid:'SIR'},
+  {name:'Baruch',es:'Baruc',en:'Baruch',pt:'Baruc',la:'Baruch',chapters:6,stem:'32-bar',ptid:'BAR'},
+  {name:'1 Maccabees',es:'1 Macabeos',en:'1 Machabees',pt:'1 Macabeus',la:'I Machabaeorum',chapters:16,stem:'20-1mac',ptid:'1MA'},
+  {name:'2 Maccabees',es:'2 Macabeos',en:'2 Machabees',pt:'2 Macabeus',la:'II Machabaeorum',chapters:15,stem:'21-2mac',ptid:'2MA'}
+];
+const URL_TEXTOS_CATOLICOS = 'https://raw.githubusercontent.com/';
+const MEMORIA_CATOLICA = Object.create(null);
+const CACHE_CATOLICA = 'tu-biblia-catolica-deuterocanon-v1';
+const esLibroCatolico = gi => gi >= 66 && gi < 73;
+const esAntiguoTestamento = gi => gi < 39 || esLibroCatolico(gi);
+const lenguaActualCatolica = () => obtenerLangBase(idioma);
+
+// Conservar la Biblia tradicional y añadir referencias vacías que se cargan
+// SOLAMENTE al abrir cada libro. No se publican textos ficticios.
+function prepararCanonCatolico(libros) {
+  if (libros.length === TOTAL_CANON_CATOLICO) return libros;
+  if (libros.length !== 66) throw new Error('Se esperaban los 66 libros tradicionales.');
+  CATOLICOS.forEach((d, i) => libros.push({
+    name:d.name, adicionado:true, fuente:'',
+    chapters:Array.from({length:d.chapters},(_,j)=>({chapter:j+1,verses:[]}))
+  }));
+  return libros;
+}
+
+async function descargarTextoCatolico(url) {
+  let cache = null;
+  try { if ('caches' in window) cache = await caches.open(CACHE_CATOLICA); } catch(e) {}
+  if (cache) { try { const resp=await cache.match(url); if(resp) return await resp.text(); } catch(e) {} }
+  const r=await fetch(url,{mode:'cors'});
+  if (!r.ok) throw new Error('No se pudo descargar el texto histórico ('+r.status+').');
+  const t=await r.text();
+  if (cache) { try { await cache.put(url, new Response(t,{headers:{'Content-Type':'application/json; charset=utf-8'}})); } catch(e) {} }
+  return t;
+}
+const esVersosValidos = ch => Array.isArray(ch) && ch.length>0 && ch.every(v=>Number.isInteger(v.verse)&&v.verse>0&&typeof v.text==='string'&&v.text.trim());
+function normalizarCapitulosCatolicos(caps) {
+  if(!Array.isArray(caps) || !caps.length) throw new Error('El libro no tiene capítulos disponibles.');
+  return caps.map((verses,i)=>({chapter:i+1,verses}));
+}
+function convertirIntercatholicum(datos) {
+  if (!Array.isArray(datos.capitula)) throw new Error('Falta el contenido del libro.');
+  return normalizarCapitulosCatolicos(datos.capitula.map(cap =>
+    Object.entries(cap.versus||{}).map(([n,t])=>({verse:Number(n),text:String(t)})).sort((a,b)=>a.verse-b.verse)));
+}
+const limpiarCanonNombre = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+function buscarLibroPortugues(datos,d) {
+  const byId={'TOB':['TOB','TBI'], 'JDT':['JDT'], 'WIS':['WIS','SAB'], 'SIR':['SIR','ECL','ECLO'], 'BAR':['BAR'], '1MA':['1MA','1MC','1MAC'], '2MA':['2MA','2MC','2MAC']};
+  const aliases=(byId[d.ptid]||[]);
+  return (datos.books||[]).find(b=>aliases.includes(String(b.id||'').toUpperCase())) ||
+    (datos.books||[]).find(b => {
+      const n=limpiarCanonNombre(b.name);const target=limpiarCanonNombre(d.pt);
+      return n===target || (d.ptid==='SIR' && n.startsWith('eclesiastico')) || (d.ptid==='1MA' && /^(1|i)macabeus/.test(n)) || (d.ptid==='2MA' && /^(2|ii)macabeus/.test(n));
+    });
+}
+const URL_PORTUGUES_CATOLICO = URL_TEXTOS_CATOLICOS+'bibliacatolica/biblia/main/biblia-matos-soares-completa.json';
+async function textoPortuguesCatolico(d) {
+  if (!MEMORIA_CATOLICA.portugues) {
+    const datos=JSON.parse(await descargarTextoCatolico(URL_PORTUGUES_CATOLICO));
+    if(!Array.isArray(datos.books)||datos.books.length!==73) throw new Error('La fuente portuguesa no tiene 73 libros.');
+    MEMORIA_CATOLICA.portugues=datos;
+  }
+  const livro=buscarLibroPortugues(MEMORIA_CATOLICA.portugues,d);
+  if(!livro) throw new Error('No se encontró '+d.pt+' en la edición portuguesa.');
+  const caps=Object.entries(livro.chapters||{}).sort((a,b)=>Number(a[0])-Number(b[0]));
+  return normalizarCapitulosCatolicos(caps.map(([,v])=>v.map(x=>({verse:Number(x.number),text:String(x.text||'')}))));
+}
+const URL_INGLES_CATOLICO=URL_TEXTOS_CATOLICOS+'jesuslovestyler/Catholic-Bible/main/assets/deut.js';
+async function textoInglesCatolico(d) {
+  if (!MEMORIA_CATOLICA.ingles) {
+    const js=await descargarTextoCatolico(URL_INGLES_CATOLICO);
+    const prefix='window.__WEB_DEUT__=';
+    const start=js.indexOf(prefix);
+    if(start<0)throw new Error('Formato inglés no reconocido.');
+    const json=js.slice(start+prefix.length).trim().replace(/;\s*$/,'');
+    const datos=JSON.parse(json);
+    if(!Array.isArray(datos)||datos.length<7)throw new Error('Edición inglesa incompleta.');
+    MEMORIA_CATOLICA.ingles=datos;
+  }
+  const aliases={Tobit:['Tobias','Tobit'],Judith:['Judith'],Wisdom:['Wisdom'],Sirach:['Ecclesiasticus','Sirach'],Baruch:['Baruch'], '1 Maccabees':['1 Machabees','1 Maccabees'], '2 Maccabees':['2 Machabees','2 Maccabees']};
+  const al=aliases[d.name].map(limpiarCanonNombre);
+  const b=MEMORIA_CATOLICA.ingles.find(x=>al.includes(limpiarCanonNombre(x.n)));
+  if(!b) throw new Error('No aparece '+d.en+' en Douay-Rheims.');
+  return normalizarCapitulosCatolicos(b.c.map(s=>String(s).split('\n').map((t,i)=>({verse:i+1,text:t.trim()}))));
+}
+// Ampliaciones en Ester (11–16) y Daniel (13–14) de las ediciones
+// completas verificadas. Los primeros capítulos y sus favoritos se conservan.
+const EXTRA_ANTIGUO = {16:{base:10,total:16,stem:'19-est'},26:{base:12,total:14,stem:'34-dan'}};
+const URL_INGLES_ANTIGUO=URL_TEXTOS_CATOLICOS+'jesuslovestyler/Catholic-Bible/main/assets/ot.js';
+async function cargarAmpliacionesAntiguo(gi) {
+  if(!(gi in EXTRA_ANTIGUO)||!BIBLIA||!BIBLIA[gi])return;
+  const idiomaBase=lenguaActualCatolica();
+  // La edición española estructurada que utilizamos no contiene las
+  // ampliaciones completas. No inventamos versículos ni mostramos capítulos vacíos.
+  if(idiomaBase==='es')return;
+  const libro=BIBLIA[gi];
+  const conf=EXTRA_ANTIGUO[gi];
+  if(libro.chapters.length>=conf.total)return;
+  const k='extras:'+idiomaBase+':'+gi;
+  if(!MEMORIA_CATOLICA[k]) MEMORIA_CATOLICA[k]=(async()=>{
+    let capitulos;
+    if(idiomaBase==='la'){
+      const url=URL_TEXTOS_CATOLICOS+'danloi2/itercatholicum/main/src/shared/data/bibles/1592_vulgata_clementina_la/'+conf.stem+'-vc-la.json';
+      capitulos=convertirIntercatholicum(JSON.parse(await descargarTextoCatolico(url)));
+    }else if(idiomaBase==='en'){
+      if(!MEMORIA_CATOLICA.inglesAntiguo){
+        const txt=await descargarTextoCatolico(URL_INGLES_ANTIGUO);
+        const pref='window.__WEB_OT__=';
+        const pos=txt.indexOf(pref);
+        if(pos<0)throw new Error('No se pudo leer Douay-Rheims.');
+        MEMORIA_CATOLICA.inglesAntiguo=JSON.parse(txt.slice(pos+pref.length).trim().replace(/;\s*$/,''));
+      }
+      const nombre=gi===16?'Esther':'Daniel';
+      const b=MEMORIA_CATOLICA.inglesAntiguo.find(x=>x.n===nombre);
+      if(!b)throw new Error('Falta '+nombre+' en la edición inglesa.');
+      capitulos=normalizarCapitulosCatolicos(b.c.map(v=>String(v).split('\n').map((t,i)=>({verse:i+1,text:t.trim()}))));
+    }else if(idiomaBase==='pt'){
+      if(!MEMORIA_CATOLICA.portugues){
+        const datos=JSON.parse(await descargarTextoCatolico(URL_PORTUGUES_CATOLICO));
+        if(!Array.isArray(datos.books)||datos.books.length!==73)throw new Error('Portugués incompleto.');
+        MEMORIA_CATOLICA.portugues=datos;
+      }
+      const id=gi===16?'EST':'DAN';
+      const b=MEMORIA_CATOLICA.portugues.books.find(x=>x.id===id);
+      if(!b)throw new Error('Falta '+id+' en la edición portuguesa.');
+      capitulos=normalizarCapitulosCatolicos(Object.entries(b.chapters||{}).sort((a,c)=>Number(a[0])-Number(c[0]))
+        .map(([,arr])=>arr.map(v=>({verse:Number(v.number),text:String(v.text||'')}))));
+    }
+    const extra=capitulos.slice(conf.base,conf.total);
+    if(extra.length!==conf.total-conf.base||extra.some(x=>!esVersosValidos(x.verses))) throw new Error('Las ampliaciones no están completas en esta fuente.');
+    return extra;
+  })().catch(e=>{delete MEMORIA_CATOLICA[k];throw e;});
+  const extras=await MEMORIA_CATOLICA[k];
+  if(BIBLIA && BIBLIA[gi]===libro && lenguaActualCatolica()===idiomaBase && libro.chapters.length===conf.base){
+    libro.chapters.push(...extras);
+    INDICE_BUSQUEDA=null;
+    construirIndiceBusqueda();
+  }
+}
+
+async function cargarLibroCatolico(gi) {
+  if (!esLibroCatolico(gi)) return;
+  const libro=BIBLIA && BIBLIA[gi];
+  if(!libro) throw new Error('Libro no disponible.');
+  if(libro.fuente) return;
+  const d=CATOLICOS[gi-66];
+  const lang=lenguaActualCatolica();
+  const key=lang+':'+gi;
+  if(!MEMORIA_CATOLICA[key]) MEMORIA_CATOLICA[key]=(async()=>{
+    let caps, fuente;
+    if(lang==='es'||lang==='la') {
+      const carpeta=lang==='es'?'1823_torres_amat_es':'1592_vulgata_clementina_la';
+      const sufijo=lang==='es'?'ta-es':'vc-la';
+      const url=URL_TEXTOS_CATOLICOS+'danloi2/itercatholicum/main/src/shared/data/bibles/'+carpeta+'/'+d.stem+'-'+sufijo+'.json';
+      caps=convertirIntercatholicum(JSON.parse(await descargarTextoCatolico(url)));
+      fuente=lang==='es'?'Torres Amat (1823)':'Vulgata Clementina (1592)';
+    } else if(lang==='en') {
+      caps=await textoInglesCatolico(d);fuente='Douay-Rheims (1899)';
+    } else if(lang==='pt') {
+      caps=await textoPortuguesCatolico(d);fuente='Matos Soares (1927–1932)';
+    } else throw new Error('Idioma no soportado.');
+    if(caps.length!==d.chapters || caps.some(cap=>!esVersosValidos(cap.verses))) throw new Error('El libro '+d.es+' está incompleto en la fuente '+fuente+'.');
+    return {caps,fuente};
+  })().catch(e=>{delete MEMORIA_CATOLICA[key];throw e;});
+  const result=await MEMORIA_CATOLICA[key];
+  // Evitar mezclar traducciones durante un cambio de idioma.
+  if (!BIBLIA || BIBLIA[gi]!==libro || lenguaActualCatolica()!==lang) return;
+  libro.chapters=result.caps;libro.fuente=result.fuente;
+  INDICE_BUSQUEDA=null;
+  construirIndiceBusqueda();
+}
+
 const DICCIONARIOS_LIBROS = {
   'es': BOOKS_ES,
   'en': BOOKS_EN,
@@ -961,7 +1138,7 @@ const UI_TEXTS = {
     tituloApp: '✦ Tu Biblia Digital',
     subtituloApp: 'Antiguo y Nuevo Testamento',
     at: 'Antiguo Testamento', nt: 'Nuevo Testamento',
-    atCount: 'Antiguo Testamento — 39 libros', ntCount: 'Nuevo Testamento — 27 libros',
+    atCount: 'Antiguo Testamento — 46 libros', ntCount: 'Nuevo Testamento — 27 libros',
     libros: 'Libros', seleccionarLibro: 'Selecciona un libro',
     eligeLibro: 'Elige un libro del panel izquierdo para comenzar',
     capitulos: 'capítulo(s)', escucharCap: '🔊 Escuchar capítulo', pararAudio: '⏹ Parar',
@@ -985,7 +1162,7 @@ const UI_TEXTS = {
     tituloApp: '✦ Your Digital Bible',
     subtituloApp: 'Old and New Testament',
     at: 'Old Testament', nt: 'New Testament',
-    atCount: 'Old Testament — 39 books', ntCount: 'New Testament — 27 books',
+    atCount: 'Old Testament — 46 books', ntCount: 'New Testament — 27 books',
     libros: 'Books', seleccionarLibro: 'Select a book',
     eligeLibro: 'Choose a book from the left panel to begin reading',
     capitulos: 'chapter(s)', escucharCap: '🔊 Listen to chapter', pararAudio: '⏹ Stop',
@@ -1009,7 +1186,7 @@ const UI_TEXTS = {
     tituloApp: '✦ Sua Bíblia Digital',
     subtituloApp: 'Antigo e Novo Testamento',
     at: 'Antigo Testamento', nt: 'Novo Testamento',
-    atCount: 'Antigo Testamento — 39 livros', ntCount: 'Novo Testamento — 27 livros',
+    atCount: 'Antigo Testamento — 46 livros', ntCount: 'Novo Testamento — 27 livros',
     libros: 'Livros', seleccionarLibro: 'Selecione um livro',
     eligeLibro: 'Escolha um livro no painel esquerdo para começar a ler',
     capitulos: 'capítulo(s)', escucharCap: '🔊 Ouvir capítulo', pararAudio: '⏹ Parar',
@@ -1065,6 +1242,7 @@ function nombreLibroTraducido(nombreEnglish) {
 }
 
 function nombreLibro(gi, respaldo) {
+  if (esLibroCatolico(gi)) { const d=CATOLICOS[gi-66]; return d[lenguaActualCatolica()] || d.es; }
   const orig = (BIBLIA && BIBLIA[gi]) ? BIBLIA[gi].name : (respaldo || '');
   return nombreLibroTraducido(orig);
 }
@@ -1158,7 +1336,7 @@ function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch
 // Se guarda solo en este dispositivo, en el mismo origen de la aplicación.
 const CLAVE_ULTIMA_LECTURA = 'biblia_ultima_lectura_v1';
 function validarLugarLectura(p) {
-  if (!p || !Number.isInteger(p.gi) || p.gi < 0 || p.gi >= TOTAL_LIBROS ||
+  if (!p || !Number.isInteger(p.gi) || p.gi < 0 || p.gi >= TOTAL_CANON_CATOLICO ||
       !Number.isInteger(p.cap) || p.cap < 1 ||
       !Number.isInteger(p.n) || p.n < 1) return null;
   return { gi: p.gi, cap: p.cap, n: p.n,
@@ -1382,7 +1560,7 @@ function cargarBiblia() {
   bibliaPromesa = operacion.then(
     b => {
       if (version === versionCargaBiblia) {
-        BIBLIA = b;
+        BIBLIA = prepararCanonCatolico(b);
         ultimoErrorCarga = '';
         INDICE_BUSQUEDA = null;
         construirIndiceBusqueda();
@@ -1415,9 +1593,10 @@ function cargarDesdeArchivo(input) {
 }
 function alCargarBiblia() {
   const p = restauracionPendiente;
-  if (p && BIBLIA && BIBLIA[p.gi] && BIBLIA[p.gi].chapters[p.cap - 1] &&
-      BIBLIA[p.gi].chapters[p.cap - 1].verses.some(v => v.verse === p.n)) {
-    switchTestament(p.gi < N_AT ? 'at' : 'nt', true);
+  if (p && BIBLIA && BIBLIA[p.gi] &&
+      ((BIBLIA[p.gi].chapters[p.cap - 1] && (esLibroCatolico(p.gi) || BIBLIA[p.gi].chapters[p.cap - 1].verses.some(v => v.verse === p.n))) ||
+        (p.gi in EXTRA_ANTIGUO && p.cap <= EXTRA_ANTIGUO[p.gi].total && lenguaActualCatolica() !== 'es'))) {
+    switchTestament(p.esAntiguoTestamento(gi) ? 'at' : 'nt', true);
     renderBooks();
     selectBook(p.gi, p.cap);
   } else {
@@ -1477,31 +1656,28 @@ function switchTestament(t, keep) {
 }
 
 function renderBooks() {
-  const el = $('books-list');
-  if (!BIBLIA) {
-    el.innerHTML = `<div class="book-item info">${ultimoErrorCarga ? tUi('errCarga') : tUi('cargandoBiblia')}</div>`;
-    return;
-  }
-  const ini = currentTestament === 'at' ? 0 : N_AT;
-  const fin = currentTestament === 'at' ? N_AT : BIBLIA.length;
-  let html = '';
-  for (let gi = ini; gi < fin; gi++) {
-    html += `<div class="book-item${gi === currentBook ? ' active' : ''}" onclick="selectBook(${gi})" id="bi-${gi}">${esc(nombreLibro(gi))}</div>`;
-  }
-  el.innerHTML = html;
+  const el=$('books-list');
+  if(!BIBLIA){el.innerHTML=`<div class="book-item info">${ultimoErrorCarga?tUi('errCarga'):tUi('cargandoBiblia')}</div>`;return;}
+  const indices=currentTestament==='at'?[...Array.from({length:16},(_,i)=>i),66,67,16,71,72,...Array.from({length:5},(_,i)=>17+i),68,69,22,23,24,70,...Array.from({length:14},(_,i)=>25+i)]:Array.from({length:27},(_,i)=>39+i);
+  el.innerHTML=indices.map(gi=>`<div class="book-item${gi===currentBook?' active':''}" onclick="selectBook(${gi})" id="bi-${gi}">${esc(nombreLibro(gi))}</div>`).join('');
 }
 
-function selectBook(gi, cap) {
+async function selectBook(gi, cap) {
   if (!BIBLIA || !BIBLIA[gi]) return;
   const libro = BIBLIA[gi];
   currentBook = gi;
   currentChapter = cap || 1;
+  if (gi in EXTRA_ANTIGUO && lenguaActualCatolica() !== 'es') {
+    try { await cargarAmpliacionesAntiguo(gi); }
+    catch(e) { console.warn('Ampliación histórica no disponible:', e.message); }
+  }
+  if (currentBook !== gi || !BIBLIA || BIBLIA[gi] !== libro) return;
   document.querySelectorAll('.book-item').forEach(b => b.classList.remove('active'));
   const el = $('bi-' + gi);
   if (el) { el.classList.add('active'); el.scrollIntoView({ block: 'nearest' }); }
   const n = libro.chapters.length;
   $('book-title').textContent = nombreLibro(gi);
-  $('book-subtitle').textContent = `${n} ${tUi('capitulos')} · ${gi < N_AT ? tUi('at') : tUi('nt')}`;
+  $('book-subtitle').textContent = `${n} ${tUi('capitulos')} · ${esAntiguoTestamento(gi) ? tUi('at') : tUi('nt')}` + (esLibroCatolico(gi) ? ' · Edición histórica' : '');
   renderChapters(libro, currentChapter);
   return loadChapter(gi, currentChapter);
 }
@@ -1544,10 +1720,13 @@ async function loadChapter(gi, chapter) {
   try {
     const biblia = await cargarBiblia();
     if (id !== cargaId) return;
+    if (esLibroCatolico(gi)) await cargarLibroCatolico(gi);
+    if (id !== cargaId) return;
     const libro = biblia[gi];
     const cap = libro && libro.chapters[chapter - 1];
     if (!cap) throw new Error(`Sin datos para ${nombreLibro(gi)} ${chapter}.`);
     hideStates();
+    if (esLibroCatolico(gi)) $('book-subtitle').textContent = `${libro.chapters.length} ${tUi('capitulos')} · ${libro.fuente}`;
     renderVerses(cap.verses, libro.name, chapter, gi);
   } catch (e) {
     if (id !== cargaId) return;
@@ -1770,6 +1949,9 @@ function abrirInformacionLegal() {
       Copyright © 2018 Diego Santos, Mario Sérgio e Marco Teles.</p>
       <p>${t.licencia}: <a href="https://creativecommons.org/licenses/by/4.0/br/" target="_blank" rel="noopener noreferrer">Creative Commons Atribuição 4.0 Brasil (CC BY 4.0 BR)</a>.</p>
       <p>${t.fuente}: <a href="https://sites.google.com/site/biblialivre/" target="_blank" rel="noopener noreferrer">Bíblia Livre</a>.</p>
+      <h3>Libros deuterocanónicos — fuentes históricas</h3>
+      <p>Español: Félix Torres Amat (1823), <a href="https://github.com/danloi2/itercatholicum" target="_blank" rel="noopener noreferrer">edición digital de Iter Catholicum</a>. Latín: Vulgata Clementina (1592), mismo repositorio. Inglés: Douay-Rheims (1899), <a href="https://github.com/jesuslovestyler/Catholic-Bible" target="_blank" rel="noopener noreferrer">Catholic-Bible</a>. Portugués: Pe. Manuel de Matos Soares, <a href="https://github.com/bibliacatolica/biblia" target="_blank" rel="noopener noreferrer">edición digital CC0</a>.</p>
+      <p>Para conservar tus favoritos y notas, los siete libros nuevos usan identificadores adicionales y no cambian los 66 anteriores. Es posible que las numeraciones de Ester, Daniel y Salmos difieran entre ediciones.</p>
       <h3>Latín / Latina</h3>
       <p>Vulgata Clementina (1592), edición histórica de dominio público. La primera descarga requiere conexión; después puede leerse sin conexión si el navegador conserva su caché.</p>
       <p>Fuente: <a href="https://github.com/midvash/bible-data/tree/main/versions/la/clem" target="_blank" rel="noopener noreferrer">Clementine Vulgate — bible-data</a>. La procedencia de esta transcripción todavía no está verificada por el proveedor.</p>
@@ -2254,7 +2436,7 @@ async function irA(gi, cap, n) {
   try { await cargarBiblia(); }
   catch (e) { mostrarErrorCarga(e.message); return; }
   if (!BIBLIA[gi] || !BIBLIA[gi].chapters[cap - 1]) { toast('Esa cita no existe en SpaRV.json.'); return; }
-  switchTestament(gi < N_AT ? 'at' : 'nt', true);
+  switchTestament(esAntiguoTestamento(gi) ? 'at' : 'nt', true);
   await selectBook(gi, cap);
   const row = document.querySelector(`.verse-row[data-n="${n}"]`);
   if (row) {
