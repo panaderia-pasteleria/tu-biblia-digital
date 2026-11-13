@@ -9,7 +9,7 @@ const FILES_TO_CACHE = [
   '/icon-192.png',
   '/icon-512.png',
   '/apple-touch-icon.png',
-  encodeURI('/Tú_Biblia_Digital_logo_design_68386b2e_2K.jpg')
+  '/banner-blanco.png'
 ];
 
 // INSTALACIÓN: guardar todos los archivos necesarios
