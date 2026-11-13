@@ -658,19 +658,7 @@ if ('serviceWorker' in navigator) {
 
 <script>
 'use strict';
-
-// PURGA Y DESACTIVACIÓN DE CACHÉ DE CUALQUIER SERVICE WORKER ANTIGUO
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(function(regs) {
-    for (let r of regs) { r.unregister(); }
-  });
-}
-if ('caches' in window) {
-  caches.keys().then(function(names) {
-    for (let name of names) { caches.delete(name); }
-  });
-}
-
+  
 const TOTAL_LIBROS = 66;
 const N_AT = 39;
 const RUTAS_BIBLIA = ['/SpaRV.json', 'SpaRV.json'];
