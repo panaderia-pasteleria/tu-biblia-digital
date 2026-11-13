@@ -1043,19 +1043,48 @@ async function textoInglesCatolico(d) {
 // completas verificadas. Los primeros capítulos y sus favoritos se conservan.
 const EXTRA_ANTIGUO = {16:{base:10,total:16,stem:'19-est'},26:{base:12,total:14,stem:'34-dan'}};
 const URL_INGLES_ANTIGUO=URL_TEXTOS_CATOLICOS+'jesuslovestyler/Catholic-Bible/main/assets/ot.js';
+// Lectura del USFM histórico de Scío, capítulos numerados y versículos consecutivos.
+function convertirScioUsfm(usfm,capitulosEsperados) {
+  const partes=String(usfm).split(/\\c\s+(\d+)\s*(?:\r?\n|$)/);
+  const caps=[];
+  for(let i=1;i+1<partes.length;i+=2){
+    const numero=Number(partes[i]);
+    const contenido=partes[i+1];
+    const matches=[...contenido.matchAll(/\\v\s+(\d+)\s+/g)];
+    const verses=matches.map((m,j)=>{
+      const desde=m.index+m[0].length;
+      const hasta=j+1<matches.length?matches[j+1].index:contenido.length;
+      const t=contenido.slice(desde,hasta)
+        .replace(/\\[a-zA-Z0-9+*]+\s*/g,' ')
+        .replace(/\s+/g,' ').trim();
+      return {verse:Number(m[1]),text:t};
+    });
+    if(!verses.length || verses.some((v,j)=>v.verse!==j+1||!v.text))
+      throw new Error('Numeración incompleta en Scío, capítulo '+numero);
+    caps.push({chapter:numero,verses});
+  }
+  if(caps.length!==capitulosEsperados||caps.some((c,i)=>c.chapter!==i+1))
+    throw new Error('La fuente histórica de Scío no tiene todos los capítulos.');
+  return caps;
+}
+
 async function cargarAmpliacionesAntiguo(gi) {
   if(!(gi in EXTRA_ANTIGUO)||!BIBLIA||!BIBLIA[gi])return;
   const idiomaBase=lenguaActualCatolica();
-  // La edición española estructurada que utilizamos no contiene las
-  // ampliaciones completas. No inventamos versículos ni mostramos capítulos vacíos.
-  if(idiomaBase==='es')return;
+  // Las ampliaciones españolas usan Scío (edición histórica de dominio público),
+  // sin sustituir los diez/doce capítulos originales de Reina-Valera.
   const libro=BIBLIA[gi];
   const conf=EXTRA_ANTIGUO[gi];
   if(libro.chapters.length>=conf.total)return;
   const k='extras:'+idiomaBase+':'+gi;
   if(!MEMORIA_CATOLICA[k]) MEMORIA_CATOLICA[k]=(async()=>{
     let capitulos;
-    if(idiomaBase==='la'){
+    if(idiomaBase==='es'){
+      const nombreArchivo=gi===16?'19-EST-scio.usfm':'32-DAN-scio.usfm';
+      const url=URL_TEXTOS_CATOLICOS+'iiTONELOC/lucerna/main/data/library/bibles/scio/'+nombreArchivo;
+      const source=await descargarTextoCatolico(url);
+      capitulos=convertirScioUsfm(source,conf.total);
+    }else if(idiomaBase==='la'){
       const url=URL_TEXTOS_CATOLICOS+'danloi2/itercatholicum/main/src/shared/data/bibles/1592_vulgata_clementina_la/'+conf.stem+'-vc-la.json';
       capitulos=convertirIntercatholicum(JSON.parse(await descargarTextoCatolico(url)));
     }else if(idiomaBase==='en'){
@@ -1595,7 +1624,7 @@ function alCargarBiblia() {
   const p = restauracionPendiente;
   if (p && BIBLIA && BIBLIA[p.gi] &&
       ((BIBLIA[p.gi].chapters[p.cap - 1] && (esLibroCatolico(p.gi) || BIBLIA[p.gi].chapters[p.cap - 1].verses.some(v => v.verse === p.n))) ||
-        (p.gi in EXTRA_ANTIGUO && p.cap <= EXTRA_ANTIGUO[p.gi].total && lenguaActualCatolica() !== 'es'))) {
+        (p.gi in EXTRA_ANTIGUO && p.cap <= EXTRA_ANTIGUO[p.gi].total ))) {
     switchTestament(esAntiguoTestamento(p.gi) ? 'at' : 'nt', true);
     renderBooks();
     selectBook(p.gi, p.cap);
@@ -1667,7 +1696,7 @@ async function selectBook(gi, cap) {
   const libro = BIBLIA[gi];
   currentBook = gi;
   currentChapter = cap || 1;
-  if (gi in EXTRA_ANTIGUO && lenguaActualCatolica() !== 'es') {
+  if (gi in EXTRA_ANTIGUO) {
     try { await cargarAmpliacionesAntiguo(gi); }
     catch(e) { console.warn('Ampliación histórica no disponible:', e.message); }
   }
@@ -1677,7 +1706,7 @@ async function selectBook(gi, cap) {
   if (el) { el.classList.add('active'); el.scrollIntoView({ block: 'nearest' }); }
   const n = libro.chapters.length;
   $('book-title').textContent = nombreLibro(gi);
-  $('book-subtitle').textContent = `${n} ${tUi('capitulos')} · ${esAntiguoTestamento(gi) ? tUi('at') : tUi('nt')}` + (esLibroCatolico(gi) ? ' · Edición histórica' : '');
+  $('book-subtitle').textContent = `${n} ${tUi('capitulos')} · ${esAntiguoTestamento(gi) ? tUi('at') : tUi('nt')}` + (esLibroCatolico(gi) ? ' · Edición histórica' : ((gi in EXTRA_ANTIGUO && currentChapter>EXTRA_ANTIGUO[gi].base)? (lenguaActualCatolica()==='es'?' · Ampliación católica: Scío de San Miguel':' · Ampliación católica: edición histórica') : ''));
   renderChapters(libro, currentChapter);
   return loadChapter(gi, currentChapter);
 }
@@ -1949,6 +1978,8 @@ function abrirInformacionLegal() {
       Copyright © 2018 Diego Santos, Mario Sérgio e Marco Teles.</p>
       <p>${t.licencia}: <a href="https://creativecommons.org/licenses/by/4.0/br/" target="_blank" rel="noopener noreferrer">Creative Commons Atribuição 4.0 Brasil (CC BY 4.0 BR)</a>.</p>
       <p>${t.fuente}: <a href="https://sites.google.com/site/biblialivre/" target="_blank" rel="noopener noreferrer">Bíblia Livre</a>.</p>
+      <h3>Ampliaciones católicas de Ester y Daniel</h3>
+      <p>En español, los capítulos adicionales (Ester 11–16 y Daniel 13–14) proceden de la traducción histórica de Felipe Scío de San Miguel, <a href="https://github.com/iiTONELOC/lucerna/tree/main/data/library/bibles/scio" target="_blank" rel="noopener noreferrer">edición digital histórica (USFM)</a>. Los capítulos originales conservan la traducción Reina-Valera. La numeración puede variar respecto de otras ediciones católicas.</p>
       <h3>Libros deuterocanónicos — fuentes históricas</h3>
       <p>Español: Félix Torres Amat (1823), <a href="https://github.com/danloi2/itercatholicum" target="_blank" rel="noopener noreferrer">edición digital de Iter Catholicum</a>. Latín: Vulgata Clementina (1592), mismo repositorio. Inglés: Douay-Rheims (1899), <a href="https://github.com/jesuslovestyler/Catholic-Bible" target="_blank" rel="noopener noreferrer">Catholic-Bible</a>. Portugués: Pe. Manuel de Matos Soares, <a href="https://github.com/bibliacatolica/biblia" target="_blank" rel="noopener noreferrer">edición digital CC0</a>.</p>
       <p>Para conservar tus favoritos y notas, los siete libros nuevos usan identificadores adicionales y no cambian los 66 anteriores. Es posible que las numeraciones de Ester, Daniel y Salmos difieran entre ediciones.</p>
