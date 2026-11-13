@@ -1537,9 +1537,9 @@ $('btn-exportar-datos').onclick = () => {
     console.error('Error al exportar:', error);
     toast('No se pudo exportar la copia');
   }
+
 };
 
- 
 $('btn-importar-datos').onclick = () => {
   const selector = document.createElement('input');
   selector.type = 'file';
@@ -1579,8 +1579,10 @@ $('btn-importar-datos').onclick = () => {
   selector.click();
 };
 
+} // FIN DE LA FUNCIÓN abrirCopiasSeguridad
 
 function abrirFavoritos() {
+
   cerrarAcciones();
   const b = abrirModal(`⭐ ${tUi('favoritos')} (${favs.length})`);
   if (!favs.length) {
