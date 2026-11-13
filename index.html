@@ -1094,6 +1094,10 @@ async function cambiarIdioma(v) {
   if (!IDIOMAS[v] || idioma === v) return;
   pararLectura();
   cerrarAcciones();
+  // Conservar el versículo visible al cambiar de traducción.
+  if (currentBook !== null) {
+    restauracionPendiente = capturarLugarVisible() || ultimaLectura;
+  }
   idioma = v;
   try { localStorage.setItem('biblia_idioma', v); } catch (e) {}
   versionCargaBiblia++;
@@ -1121,6 +1125,84 @@ async function cambiarIdioma(v) {
 // ALMACÉN LOCAL
 function lsGet(k, def) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch (e) { return def; } }
 function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+// CONTINUAR LEYENDO: almacenamiento independiente de favoritos y notas.
+// Se guarda solo en este dispositivo, en el mismo origen de la aplicación.
+const CLAVE_ULTIMA_LECTURA = 'biblia_ultima_lectura_v1';
+function validarLugarLectura(p) {
+  if (!p || !Number.isInteger(p.gi) || p.gi < 0 || p.gi >= TOTAL_LIBROS ||
+      !Number.isInteger(p.cap) || p.cap < 1 ||
+      !Number.isInteger(p.n) || p.n < 1) return null;
+  return { gi: p.gi, cap: p.cap, n: p.n,
+    offset: Number.isFinite(p.offset) ? Math.max(-120, Math.min(1000, p.offset)) : 0 };
+}
+let ultimaLectura = validarLugarLectura(lsGet(CLAVE_ULTIMA_LECTURA, null));
+let restauracionPendiente = ultimaLectura;
+let restaurandoLectura = false;
+let temporizadorPosicion = null;
+
+function guardarLugarLectura(gi, cap, n, offset = 0) {
+  const p = validarLugarLectura({ gi, cap, n, offset });
+  if (!p) return;
+  ultimaLectura = p;
+  lsSet(CLAVE_ULTIMA_LECTURA, p);
+}
+
+// Usar el primer versículo visible, no los píxeles absolutos, para que
+// funcione también al cambiar idioma o tamaño de pantalla.
+function capturarLugarVisible() {
+  if (currentBook === null || !BIBLIA) return null;
+  const area = $('verses-area');
+  const limites = area.getBoundingClientRect();
+  for (const fila of area.querySelectorAll('.verse-row[data-n]')) {
+    const r = fila.getBoundingClientRect();
+    if (r.bottom > limites.top + 1 && r.top < limites.bottom) {
+      return validarLugarLectura({ gi: currentBook, cap: currentChapter,
+        n: Number(fila.dataset.n), offset: r.top - limites.top });
+    }
+  }
+  return null;
+}
+
+function guardarLugarVisible() {
+  if (restaurandoLectura) return;
+  const p = capturarLugarVisible();
+  if (p) guardarLugarLectura(p.gi, p.cap, p.n, p.offset);
+}
+
+function restaurarLugarDespuesDeRender(gi, cap) {
+  const p = restauracionPendiente;
+  if (p && p.gi === gi && p.cap === cap) {
+    restauracionPendiente = null;
+    restaurandoLectura = true;
+    requestAnimationFrame(() => {
+      const area = $('verses-area');
+      const fila = Array.from(area.querySelectorAll('.verse-row[data-n]'))
+        .find(el => Number(el.dataset.n) === p.n);
+      if (fila && currentBook === gi && currentChapter === cap) {
+        const desfase = fila.getBoundingClientRect().top - area.getBoundingClientRect().top;
+        area.scrollTop += desfase - p.offset;
+        fila.classList.add('selected');
+      }
+      requestAnimationFrame(() => {
+        restaurandoLectura = false;
+        guardarLugarVisible();
+      });
+    });
+  } else {
+    restauracionPendiente = null;
+    restaurandoLectura = false;
+    // Abrir otro libro/capítulo comienza en su primer versículo.
+    guardarLugarLectura(gi, cap, 1, 0);
+  }
+}
+
+$('verses-area').addEventListener('scroll', () => {
+  if (restaurandoLectura) return;
+  clearTimeout(temporizadorPosicion);
+  temporizadorPosicion = setTimeout(guardarLugarVisible, 180);
+}, { passive: true });
+
 let favs = lsGet('biblia_favs', []);
 let notas = lsGet('biblia_notas', {});
 if (!Array.isArray(favs)) favs = [];
@@ -1250,9 +1332,18 @@ function cargarDesdeArchivo(input) {
   r.readAsText(f, 'utf-8');
 }
 function alCargarBiblia() {
-  renderBooks();
-  if (currentBook !== null) selectBook(currentBook, currentChapter);
-  else showEmpty();
+  const p = restauracionPendiente;
+  if (p && BIBLIA && BIBLIA[p.gi] && BIBLIA[p.gi].chapters[p.cap - 1] &&
+      BIBLIA[p.gi].chapters[p.cap - 1].verses.some(v => v.verse === p.n)) {
+    switchTestament(p.gi < N_AT ? 'at' : 'nt', true);
+    renderBooks();
+    selectBook(p.gi, p.cap);
+  } else {
+    restauracionPendiente = null;
+    renderBooks();
+    if (currentBook !== null) selectBook(currentBook, currentChapter);
+    else showEmpty();
+  }
 }
 function reintentarCarga() {
   showLoading();
@@ -1400,12 +1491,16 @@ function renderVerses(verses, bookName, chapter, gi) {
     row.onclick = () => {
       document.querySelectorAll('.verse-row').forEach(r => r.classList.remove('selected'));
       row.classList.add('selected');
+      const zona = $('verses-area').getBoundingClientRect();
+      guardarLugarLectura(gi, chapter, v.n, row.getBoundingClientRect().top - zona.top);
       abrirAcciones(v, bookName, chapter, row, gi);
     };
     frag.appendChild(row);
   });
   area.appendChild(frag);
+  restaurandoLectura = true;
   area.scrollTop = 0;
+  restaurarLugarDespuesDeRender(gi, chapter);
 }
 
 // SÍNTESIS DE VOZ
@@ -2078,6 +2173,7 @@ async function irA(gi, cap, n) {
   if (row) {
     document.querySelectorAll('.verse-row').forEach(r => r.classList.remove('selected'));
     row.classList.add('selected');
+    guardarLugarLectura(gi, cap, n, 0);
     row.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
 }
