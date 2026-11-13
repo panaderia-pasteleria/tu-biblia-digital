@@ -766,7 +766,25 @@ if ('serviceWorker' in navigator) {
 <!-- MODAL COMÚN (Favoritos / Notas) -->
 <div id="modal" role="dialog" aria-modal="true" onclick="if(event.target===this)cerrarModal()">
   <div id="modal-box">
-    <div id="modal-head"><h2 id="modal-title"></h2><button class="top-btn" onclick="cerrarModal()" aria-label="Cerrar">✕</button></div>
+    <div id="modal-head">
+  <h2 id="modal-title"></h2>
+
+  <button
+    class="top-btn"
+    type="button"
+    onclick="abrirCopiasSeguridad()"
+    aria-label="Copia de seguridad de favoritos y notas">
+    💾 Copia
+  </button>
+
+  <button
+    class="top-btn"
+    type="button"
+    onclick="cerrarModal()"
+    aria-label="Cerrar">
+    ✕
+  </button>
+</div>
     <div id="modal-body"></div>
   </div>
 </div>
