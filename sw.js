@@ -1,100 +1,40 @@
-const CACHE_NAME = 'tu-biblia-digital-v5';
+const CACHE_NAME = 'tu-biblia-digital-v6';
 const CACHE_PREFIX = 'tu-biblia-digital-';
-
-const FILES_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/SpaRV.json',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
-  '/apple-touch-icon.png',
-  '/banner-blanco.png'
-];
-
-// INSTALACIÓN: guardar todos los archivos necesarios
+const FILES_TO_CACHE = ['/', '/index.html', '/SpaRV.json', '/manifest.json', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/banner-blanco.png'];
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(FILES_TO_CACHE))
-      .then(() => self.skipWaiting())
-  );
+  event.waitUntil((async () => {
+    const cache=await caches.open(CACHE_NAME);
+    await cache.addAll(FILES_TO_CACHE.map(p=>new Request(p,{cache:'reload'})));
+    await self.skipWaiting();
+  })());
 });
-
-// ACTIVACIÓN: eliminar solo las cachés antiguas de esta aplicación
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(
-        keys
-          .filter(key =>
-            key.startsWith(CACHE_PREFIX) &&
-            key !== CACHE_NAME
-          )
-          .map(key => caches.delete(key))
-      ))
-      .then(() => self.clients.claim())
-  );
+self.addEventListener('activate',event=>{
+  event.waitUntil((async()=>{
+    const keys=await caches.keys();
+    await Promise.all(keys.filter(k=>k.startsWith(CACHE_PREFIX)&&k!==CACHE_NAME).map(k=>caches.delete(k)));
+    await self.clients.claim();
+  })());
 });
-
-// PETICIONES: funcionamiento online y offline
-self.addEventListener('fetch', event => {
-  const request = event.request;
-
-  // Solo gestionar peticiones GET del mismo origen
-  if (request.method !== 'GET') return;
-
-  const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return;
-
-  // HTML: intentar obtener la versión más reciente
-  if (
-    request.mode === 'navigate' ||
-    url.pathname === '/' ||
-    url.pathname.endsWith('/index.html')
-  ) {
-    event.respondWith(
-      (async () => {
-        try {
-          const response = await fetch(request);
-
-          if (response.ok) {
-            const cache = await caches.open(CACHE_NAME);
-            await cache.put(request, response.clone());
-          }
-
-          return response;
-        } catch (error) {
-          const cached = await caches.match(request);
-
-          if (cached) return cached;
-
-          const fallback = await caches.match('/index.html');
-
-          if (fallback) return fallback;
-
-          throw error;
-        }
-      })()
-    );
+self.addEventListener('fetch',event=>{
+  const req=event.request;
+  if(req.method!=='GET')return;
+  const url=new URL(req.url);
+  if(url.origin!==self.location.origin)return;
+  if(req.mode==='navigate'||url.pathname==='/'||url.pathname==='/index.html'){
+    event.respondWith((async()=>{
+      try{
+        const res=await fetch(req);
+        if(res.ok){const cache=await caches.open(CACHE_NAME);await cache.put(req,res.clone());}
+        return res;
+      }catch(e){return (await caches.match(req))||(await caches.match('/index.html'))||(await caches.match('/'))||Response.error();}
+    })());
     return;
   }
-
-  // Biblia, iconos y recursos: utilizar caché primero
-  event.respondWith(
-    (async () => {
-      const cached = await caches.match(request);
-
-      if (cached) return cached;
-
-      const response = await fetch(request);
-
-      if (response.ok) {
-        const cache = await caches.open(CACHE_NAME);
-        await cache.put(request, response.clone());
-      }
-
-      return response;
-    })()
-  );
+  event.respondWith((async()=>{
+    const cached=await caches.match(req);
+    if(cached)return cached;
+    const res=await fetch(req);
+    if(res.ok){const cache=await caches.open(CACHE_NAME);await cache.put(req,res.clone());}
+    return res;
+  })());
 });
