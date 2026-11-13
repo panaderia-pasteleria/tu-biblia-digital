@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tu-biblia-digital-v6';
+const CACHE_NAME = 'tu-biblia-digital-v7';
 const CACHE_PREFIX = 'tu-biblia-digital-';
 const FILES_TO_CACHE = ['/', '/index.html', '/SpaRV.json', '/manifest.json', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/banner-blanco.png'];
 self.addEventListener('install', event => {
