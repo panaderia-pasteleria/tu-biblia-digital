@@ -1469,6 +1469,47 @@ function abrirModal(titulo) {
 }
 function cerrarModal() { $('modal').classList.remove('open'); }
 
+function abrirCopiasSeguridad() {
+  cerrarAcciones();
+
+  const b = abrirModal('💾 Copia de seguridad');
+
+  b.innerHTML = `
+    <div style="padding:16px;line-height:1.7">
+      <p>Guarda tus favoritos y notas personales
+      para recuperarlos si cambias de dispositivo.</p>
+
+      <div class="acc" style="margin-top:18px">
+        <button class="top-btn pri"
+          type="button"
+          id="btn-exportar-datos">
+          ⬇️ Exportar mis datos
+        </button>
+
+        <button class="top-btn"
+          type="button"
+          id="btn-importar-datos">
+          ⬆️ Restaurar mis datos
+        </button>
+      </div>
+
+      <p style="margin-top:16px;font-size:12px;
+        color:var(--text-secondary)">
+        Las copias se guardarán en un archivo JSON.
+        No se enviarán datos a ningún servidor.
+      </p>
+    </div>
+  `;
+
+  $('btn-exportar-datos').onclick = () => {
+    toast('Próximamente: exportación');
+  };
+
+  $('btn-importar-datos').onclick = () => {
+    toast('Próximamente: restauración');
+  };
+}
+
 function abrirFavoritos() {
   cerrarAcciones();
   const b = abrirModal(`⭐ ${tUi('favoritos')} (${favs.length})`);
