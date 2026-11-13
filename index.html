@@ -1501,9 +1501,43 @@ function abrirCopiasSeguridad() {
     </div>
   `;
 
-  $('btn-exportar-datos').onclick = () => {
-    toast('Próximamente: exportación');
-  };
+$('btn-exportar-datos').onclick = () => {
+  try {
+    const copia = {
+      aplicacion: 'Tu Biblia Digital',
+      version: 1,
+      fecha: new Date().toISOString(),
+      favoritos: favs,
+      notas: notas
+    };
+
+    const contenido = JSON.stringify(copia, null, 2);
+    const archivo = new Blob(
+      [contenido],
+      { type: 'application/json;charset=utf-8' }
+    );
+
+    const url = URL.createObjectURL(archivo);
+    const enlace = document.createElement('a');
+
+    enlace.href = url;
+    enlace.download =
+      'tu-biblia-digital-copia-' +
+      new Date().toISOString().slice(0, 10) +
+      '.json';
+
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+
+    toast('Copia de seguridad preparada');
+  } catch (error) {
+    console.error('Error al exportar:', error);
+    toast('No se pudo exportar la copia');
+  }
+};
 
   $('btn-importar-datos').onclick = () => {
     toast('Próximamente: restauración');
