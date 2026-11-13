@@ -1,4 +1,6 @@
-const CACHE_NAME = 'tu-biblia-digital-v2';
+
+const CACHE_NAME = 'tu-biblia-digital-v3';
+const CACHE_PREFIX = 'tu-biblia-digital-';
 
 const FILES_TO_CACHE = [
   '/',
@@ -11,53 +13,89 @@ const FILES_TO_CACHE = [
   encodeURI('/Tú_Biblia_Digital_logo_design_68386b2e_2K.jpg')
 ];
 
+// INSTALACIÓN: guardar todos los archivos necesarios
 self.addEventListener('install', event => {
-  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      // addAll blindado para que se instale sin importar fallos de red puntuales
-      return Promise.allSettled(
-        FILES_TO_CACHE.map(url => cache.add(url))
-      );
-    })
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(FILES_TO_CACHE))
+      .then(() => self.skipWaiting())
   );
 });
 
+// ACTIVACIÓN: eliminar solo las cachés antiguas de esta aplicación
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.map(key => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key); // Destruye cualquier caché vieja congelada
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
+    caches.keys()
+      .then(keys => Promise.all(
+        keys
+          .filter(key =>
+            key.startsWith(CACHE_PREFIX) &&
+            key !== CACHE_NAME
+          )
+          .map(key => caches.delete(key))
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
+// PETICIONES: funcionamiento online y offline
 self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
+  const request = event.request;
 
-  // Para la navegación e index.html: Network-First (primero pide la versión nueva al servidor)
-  if (event.request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('index.html')) {
+  // Solo gestionar peticiones GET del mismo origen
+  if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  // HTML: intentar obtener la versión más reciente
+  if (
+    request.mode === 'navigate' ||
+    url.pathname === '/' ||
+    url.pathname.endsWith('/index.html')
+  ) {
     event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          if (response && response.status === 200) {
-            const resClone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, resClone));
+      (async () => {
+        try {
+          const response = await fetch(request);
+
+          if (response.ok) {
+            const cache = await caches.open(CACHE_NAME);
+            await cache.put(request, response.clone());
           }
+
           return response;
-        })
-        .catch(() => caches.match(event.request).then(res => res || caches.match('/index.html')))
+        } catch (error) {
+          const cached = await caches.match(request);
+
+          if (cached) return cached;
+
+          const fallback = await caches.match('/index.html');
+
+          if (fallback) return fallback;
+
+          throw error;
+        }
+      })()
     );
     return;
   }
 
-  // Para los demás archivos (SpaRV.json, iconos, imágenes): Caché primero, red después
+  // Biblia, iconos y recursos: utilizar caché primero
   event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
+    (async () => {
+      const cached = await caches.match(request);
+
+      if (cached) return cached;
+
+      const response = await fetch(request);
+
+      if (response.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(request, response.clone());
+      }
+
+      return response;
+    })()
   );
 });
