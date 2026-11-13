@@ -716,6 +716,7 @@ if ('serviceWorker' in navigator) {
     <option value="es-ES">🇪🇸 España</option>
     <option value="en">🇬🇧 English</option>
     <option value="pt">🇵🇹 Português</option>
+    <option value="la">🇻🇦 Latín · Vulgata</option>
   </select>
   <button class="top-btn" onclick="abrirBuscador()" aria-label="Buscar en la Biblia">🔍<span class="bt" id="lbl-buscar"> Buscar</span></button>
   <button class="top-btn" onclick="abrirFavoritos()" aria-label="Favoritos">⭐<span class="bt" id="lbl-favs"> Favoritos</span></button>
@@ -924,10 +925,35 @@ const BOOKS_PT = {
   "Revelation of John": "Apocalipse", "Revelation": "Apocalipse"
 };
 
+const BOOKS_LA = {
+  'Genesis':'Genesis','Exodus':'Exodus','Leviticus':'Leviticus','Numbers':'Numeri',
+  'Deuteronomy':'Deuteronomium','Joshua':'Iosue','Judges':'Iudices','Ruth':'Ruth',
+  'I Samuel':'I Samuel','II Samuel':'II Samuel','I Kings':'III Regum','II Kings':'IV Regum',
+  'I Chronicles':'I Paralipomenon','II Chronicles':'II Paralipomenon','Ezra':'Esdrae',
+  'Nehemiah':'Nehemiae','Esther':'Esther','Job':'Iob','Psalms':'Psalmi',
+  'Proverbs':'Proverbia','Ecclesiastes':'Ecclesiastes','Song of Solomon':'Canticum Canticorum',
+  'Isaiah':'Isaias','Jeremiah':'Ieremias','Lamentations':'Lamentationes',
+  'Ezekiel':'Ezechiel','Daniel':'Daniel','Hosea':'Osee','Joel':'Ioel',
+  'Amos':'Amos','Obadiah':'Abdias','Jonah':'Ionas','Micah':'Michaeas',
+  'Nahum':'Nahum','Habakkuk':'Habacuc','Zephaniah':'Sophonias',
+  'Haggai':'Aggaeus','Zechariah':'Zacharias','Malachi':'Malachias',
+  'Matthew':'Matthaeus','Mark':'Marcus','Luke':'Lucas','John':'Ioannes',
+  'Acts':'Actus Apostolorum','Romans':'Romanos','I Corinthians':'I Corinthios',
+  'II Corinthians':'II Corinthios','Galatians':'Galatas','Ephesians':'Ephesios',
+  'Philippians':'Philippenses','Colossians':'Colossenses',
+  'I Thessalonians':'I Thessalonicenses','II Thessalonians':'II Thessalonicenses',
+  'I Timothy':'I Timotheum','II Timothy':'II Timotheum','Titus':'Titum',
+  'Philemon':'Philemonem','Hebrews':'Hebraeos','James':'Iacobi',
+  'I Peter':'I Petri','II Peter':'II Petri','I John':'I Ioannis','II John':'II Ioannis',
+  'III John':'III Ioannis','Jude':'Iudae','Revelation of John':'Apocalypsis',
+  'Revelation':'Apocalypsis'
+};
+
 const DICCIONARIOS_LIBROS = {
   'es': BOOKS_ES,
   'en': BOOKS_EN,
-  'pt': BOOKS_PT
+  'pt': BOOKS_PT,
+  'la': BOOKS_LA
 };
 
 const UI_TEXTS = {
@@ -1009,7 +1035,8 @@ const IDIOMAS = {
   'es-419': { voz: ['es-MX', 'es-US', 'es-419', 'es-CO', 'es-AR', 'es'] },
   'es-ES':  { voz: ['es-ES', 'es'] },
   'en':     { voz: ['en-US', 'en-GB', 'en'] },
-  'pt':     { voz: ['pt-BR', 'pt-PT', 'pt'] }
+  'pt':     { voz: ['pt-BR', 'pt-PT', 'pt'] },
+  'la':     { voz: ['la', 'la-VA'] }
 };
 
 let idioma = (() => {
@@ -1026,6 +1053,7 @@ function obtenerLangBase(idm) {
   if (idm.startsWith('es')) return 'es';
   if (idm.startsWith('pt')) return 'pt';
   if (idm.startsWith('en')) return 'en';
+  if (idm.startsWith('la')) return 'la';
   return 'es';
 }
 
@@ -1054,7 +1082,7 @@ function tUi(k, params) {
 function actualizarTextosUI() {
   const h1 = $('topbar-h1'); if (h1) h1.textContent = tUi('tituloApp');
   const sub = $('topbar-sub'); if (sub) sub.textContent = tUi('subtituloApp');
-  const legal = $('btn-info-legal'); if (legal) legal.textContent = ({ es:'ⓘ Información legal', en:'ⓘ Legal information', pt:'ⓘ Informações legais' })[obtenerLangBase(idioma)] || 'ⓘ Información legal';
+  const legal = $('btn-info-legal'); if (legal) legal.textContent = ({ es:'ⓘ Información legal', en:'ⓘ Legal information', pt:'ⓘ Informações legais', la:'ⓘ Notitiae legales' })[obtenerLangBase(idioma)] || 'ⓘ Información legal';
 
   const tabAt = $('tab-at'); if (tabAt) tabAt.textContent = tUi('at');
   const tabNt = $('tab-nt'); if (tabNt) tabNt.textContent = tUi('nt');
@@ -1073,7 +1101,7 @@ function actualizarTextosUI() {
   const ep2 = $('empty-p2'); if (ep2) ep2.textContent = tUi('emptyP2');
 
   const lt = $('loading-text'); if (lt) lt.textContent = tUi('cargandoBiblia');
-  const et = $('err-title'); if (et) et.textContent = obtenerLangBase(idioma) === 'es' ? tUi('errCarga') : (obtenerLangBase(idioma) === 'en' ? 'Could not load King James Bible.' : 'Não foi possível carregar a Bíblia Livre.');
+  const et = $('err-title'); if (et) et.textContent = obtenerLangBase(idioma) === 'es' ? tUi('errCarga') : (obtenerLangBase(idioma) === 'en' ? 'Could not load King James Bible.' : (obtenerLangBase(idioma) === 'la' ? 'No se pudo cargar la Vulgata latina. Conéctate a internet para la primera descarga.' : 'Não foi possível carregar a Bíblia Livre.'));
   const br = $('btn-reintentar'); if (br) br.textContent = tUi('reintentar');
 
   const bInp = $('busqueda-input');
@@ -1291,12 +1319,66 @@ function obtenerBibliaIncluida(lang) {
   CACHE_BIBLIAS[lang] = validarBiblia({ books: libros });
   return CACHE_BIBLIAS[lang];
 }
+// VULGATA CLEMENTINA (1592). Texto latino, 66 libros indexados según OSIS.
+// La primera selección requiere internet; Cache Storage conserva una copia para
+// posteriores lecturas sin conexión cuando el navegador permite almacenamiento.
+const URL_VULGATA = 'https://raw.githubusercontent.com/midvash/bible-data/main/versions/la/clem/clem.json';
+const CACHE_VULGATA = 'tu-biblia-vulgata-clementina-v1';
+
+async function obtenerRespuestaVulgata() {
+  let cache = null;
+  try { if ('caches' in window) cache = await caches.open(CACHE_VULGATA); } catch (e) {}
+  // Priorizar la versión guardada: evita transferir 6 MB en cada apertura.
+  if (cache) {
+    try { const guardada = await cache.match(URL_VULGATA); if (guardada) return guardada; } catch (e) {}
+  }
+  let respuesta;
+  try { respuesta = await fetch(URL_VULGATA, { mode: 'cors' }); }
+  catch (e) { throw new Error('Sin conexión para descargar la Vulgata. Selecciona Latín una vez con internet para guardarla.'); }
+  if (!respuesta.ok) throw new Error('La fuente latina no respondió (HTTP ' + respuesta.status + ').');
+  if (cache) { try { await cache.put(URL_VULGATA, respuesta.clone()); } catch (e) {} }
+  return respuesta;
+}
+
+async function descargarVulgataLatina() {
+  if (CACHE_BIBLIAS.la) return CACHE_BIBLIAS.la;
+  const respuesta = await obtenerRespuestaVulgata();
+  let origen;
+  try { origen = await respuesta.json(); }
+  catch (e) { throw new Error('No se pudo leer el archivo de la Vulgata latina.'); }
+  if (!origen || !Array.isArray(origen.books) || origen.books.length !== 66)
+    throw new Error('El archivo latino no contiene los 66 libros esperados.');
+  const canon = [
+    'Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth',
+    'I Samuel','II Samuel','I Kings','II Kings','I Chronicles','II Chronicles','Ezra','Nehemiah',
+    'Esther','Job','Psalms','Proverbs','Ecclesiastes','Song of Solomon','Isaiah','Jeremiah',
+    'Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum',
+    'Habakkuk','Zephaniah','Haggai','Zechariah','Malachi','Matthew','Mark','Luke','John',
+    'Acts','Romans','I Corinthians','II Corinthians','Galatians','Ephesians','Philippians',
+    'Colossians','I Thessalonians','II Thessalonians','I Timothy','II Timothy','Titus',
+    'Philemon','Hebrews','James','I Peter','II Peter','I John','II John','III John','Jude',
+    'Revelation of John'
+  ];
+  const ordenados = Array.from({length:66}, (_, i) => origen.books.find(b => b.bookId === i + 1));
+  if (ordenados.some(b => !b || !Array.isArray(b.chapters)))
+    throw new Error('El orden de los libros latinos no coincide con el canon esperado.');
+  const libros = ordenados.map((b, gi) => ({
+    name: canon[gi],
+    chapters: b.chapters.map((cap, ci) => ({
+      chapter: ci + 1,
+      verses: cap.verses.map(v => ({verse: Number(v.number), text: String(v.text || '')}))
+    }))
+  }));
+  CACHE_BIBLIAS.la = validarBiblia({books:libros});
+  return CACHE_BIBLIAS.la;
+}
+
 function cargarBiblia() {
   if (BIBLIA) return Promise.resolve(BIBLIA);
   if (bibliaPromesa) return bibliaPromesa;
   const version = versionCargaBiblia;
   const lang = obtenerLangBase(idioma);
-  const operacion = lang === 'es' ? descargarBiblia() : Promise.resolve().then(() => obtenerBibliaIncluida(lang));
+  const operacion = lang === 'es' ? descargarBiblia() : (lang === 'la' ? descargarVulgataLatina() : Promise.resolve().then(() => obtenerBibliaIncluida(lang)));
   bibliaPromesa = operacion.then(
     b => {
       if (version === versionCargaBiblia) {
@@ -1527,6 +1609,7 @@ function hablar(texto, id, alTerminar, retraso) {
   if (id !== lecturaId) return;
   const u = new SpeechSynthesisUtterance(texto);
   const v = vozPara(idioma);
+  if (idioma === 'la' && !v) { toast('Este dispositivo no dispone de voz latina; se usará la voz predeterminada.'); }
   if (v) u.voice = v;
   u.lang = v ? v.lang : (IDIOMAS[idioma] ? IDIOMAS[idioma].voz[0] : 'es');
   u.rate = 0.95;
@@ -1643,7 +1726,7 @@ function abrirInformacionLegal() {
   cerrarAcciones();
   toggleLibros(false);
   const lang = obtenerLangBase(idioma);
-  const titulo = { es:'ⓘ Información legal y traducciones', en:'ⓘ Legal information and translations', pt:'ⓘ Informações legais e traduções' }[lang];
+  const titulo = { es:'ⓘ Información legal y traducciones', en:'ⓘ Legal information and translations', pt:'ⓘ Informações legais e traduções', la:'ⓘ Notitiae legales et versiones' }[lang];
   const b = abrirModal(titulo);
   const textos = {
     es: {
@@ -1687,6 +1770,10 @@ function abrirInformacionLegal() {
       Copyright © 2018 Diego Santos, Mario Sérgio e Marco Teles.</p>
       <p>${t.licencia}: <a href="https://creativecommons.org/licenses/by/4.0/br/" target="_blank" rel="noopener noreferrer">Creative Commons Atribuição 4.0 Brasil (CC BY 4.0 BR)</a>.</p>
       <p>${t.fuente}: <a href="https://sites.google.com/site/biblialivre/" target="_blank" rel="noopener noreferrer">Bíblia Livre</a>.</p>
+      <h3>Latín / Latina</h3>
+      <p>Vulgata Clementina (1592), edición histórica de dominio público. La primera descarga requiere conexión; después puede leerse sin conexión si el navegador conserva su caché.</p>
+      <p>Fuente: <a href="https://github.com/midvash/bible-data/tree/main/versions/la/clem" target="_blank" rel="noopener noreferrer">Clementine Vulgate — bible-data</a>. La procedencia de esta transcripción todavía no está verificada por el proveedor.</p>
+      <p>Advertencia: la numeración latina de algunos salmos y las ampliaciones de Ester y Daniel pueden diferir de otras traducciones.</p>
       <p>${t.nota}</p>
     </div>`;
 }
