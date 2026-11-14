@@ -65,3 +65,9 @@ El conector Supabase disponible no gestiona Edge Function Secrets ni Auth URL Co
 4. No publicar ni fusionar hasta probar correctamente el entorno de PRUEBAS. Precio de prueba propio, secret key de prueba, webhook de prueba, sin pagos reales.
 5. Confirmar licencias comerciales del contenido y completar el contenido privado (el archivo abierto anterior no puede protegerse retroactivamente).
 6. Registrar/validar obligaciones de IVA en Stripe Tax antes de ventas internacionales; los ajustes de Tax actuales no recaudan aún IVA (sin registros).
+
+## Webhook Stripe creado (producción, aun sin llave de firma en Supabase)
+- Endpoint ID: `we_1UbUyx2MlJh2e6JZk2sPVJyr`
+- Endpoint: `https://hbzyhdpkjmyarzsykhsx.supabase.co/functions/v1/stripe-webhook`
+- Suscrito a `checkout.session.completed` y `checkout.session.async_payment_succeeded`.
+- **No crear ventas reales** hasta copiar la firma `whsec_...` desde Stripe a secretos de Supabase y probar entrega. No registrar firma en GitHub.
