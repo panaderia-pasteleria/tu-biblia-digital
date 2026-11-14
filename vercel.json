@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/comercial/",
+      "permanent": false
+    }
+  ]
+}
