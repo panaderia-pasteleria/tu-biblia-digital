@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Tu Biblia Digital | Acceso</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#111314;color:#f5f0e8}
+*{box-sizing:border-box}body{margin:0;min-height:100svh;display:grid;place-items:center;padding:24px}
+main{max-width:490px;width:100%;border:1px solid #393631;border-radius:22px;padding:clamp(22px,5vw,42px);background:#1c1c1b;box-shadow:0 18px 50px #0008}
+.kicker{color:#d2b478;letter-spacing:.22em;text-transform:uppercase;font-size:11px}
+h1{font-family:Georgia,serif;font-size:clamp(29px,6vw,43px);font-weight:normal;margin:.5em 0}.subtitle{color:#c5bbb0;line-height:1.6}
+.price{font-size:44px;font-weight:700;margin:24px 0 4px}.small{font-size:12px;color:#bdb5ab;line-height:1.5}
+section{margin-top:25px;padding-top:22px;border-top:1px solid #393631}
+label{display:block;margin-bottom:9px;font-size:14px}input{width:100%;padding:13px 14px;background:#101110;border:1px solid #666052;border-radius:9px;color:white;font:inherit}
+button{border:0;border-radius:9px;font:inherit;padding:14px 17px;cursor:pointer}
+.primary{width:100%;background:#d6b67a;color:#16130d;font-weight:650;margin-top:12px}.secondary{margin-top:12px;width:100%;background:transparent;color:#dfc895;border:1px solid #6f5d40}
+button:disabled{opacity:.45;cursor:not-allowed}#status{min-height:40px;margin-top:15px;color:#dbc9a7;font-size:14px;line-height:1.5}
+.hidden{display:none}a{color:#d6b67a}
+</style></head><body><main>
+<div class="kicker">Lectura bíblica sin distracciones</div>
+<h1>Tu Biblia Digital</h1>
+<p class="subtitle">73 libros de tradición católica · 4 idiomas · favoritos, notas y lectura sin conexión.</p>
+<div class="price">2,99 €</div><div class="small">Pago único. Sin anuncios ni suscripciones. Acceso sujeto a las condiciones de compra.</div>
+<section><label for="email">1. Inicia sesión con tu correo</label>
+<input id="email" type="email" autocomplete="email" placeholder="correo@ejemplo.com">
+<button class="primary" id="login">Recibir enlace de acceso</button>
+<p class="small">Enviaremos un enlace de inicio de sesión. No te pediremos contraseña.</p></section>
+<section id="buy" class="hidden"><strong>2. Elige cómo obtener acceso</strong>
+<button class="primary" id="checkout">Comprar por 2,99 €</button>
+<label for="gift" style="margin-top:18px">¿Tienes un código de regalo?</label>
+<input id="gift" autocomplete="off" placeholder="TBD-...">
+<button class="secondary" id="redeem">Canjear código gratuito</button>
+<button class="secondary" id="logout">Cerrar sesión</button>
+</section>
+<section id="unlocked" class="hidden"><strong>Acceso confirmado</strong>
+<p class="subtitle">Tu cuenta tiene una licencia activa. La zona de lectura protegida se habilitará después de las pruebas de lanzamiento.</p>
+<button class="secondary" id="logout2">Cerrar sesión</button>
+</section>
+<p id="status" role="status" aria-live="polite"></p>
+<p class="small">Versión de desarrollo: las compras reales permanecerán deshabilitadas hasta completar la integración y las pruebas.</p>
+</main>
+<script type="module">
+import {createClient} from "https://esm.sh/@supabase/supabase-js@2";
+const cfg=window.TBD_CONFIG;
+const $=id=>document.getElementById(id);
+const status=(s)=>{$("status").textContent=s};
+if(!cfg?.supabaseUrl||!cfg?.supabaseAnonKey||!cfg?.functionsUrl){status("Sistema de pagos pendiente de configuración segura.");}
+else {
+ const sb=createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
+ const call=async(name,body)=>{
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session)throw Error("Primero inicia sesión");
+  const res=await fetch(cfg.functionsUrl+"/"+name,{method:"POST",headers:{"Content-Type":"application/json",apikey:cfg.supabaseAnonKey,Authorization:"Bearer "+session.access_token},body:JSON.stringify(body)});
+  const out=await res.json().catch(()=>({}));
+  if(!res.ok)throw Error(out.error||"No se pudo completar");
+  return out;
+ };
+ const refresh=async()=>{
+  const {data:{user}}=await sb.auth.getUser();
+  $("buy").classList.add("hidden");$("unlocked").classList.add("hidden");
+  if(!user)return;
+  const {data,error}=await sb.from("entitlements").select("user_id").eq("user_id",user.id).maybeSingle();
+  if(error){status("No se pudo comprobar tu acceso.");return;}
+  $("unlocked").classList.toggle("hidden",!data);$("buy").classList.toggle("hidden",!!data);
+  status(data?"Tu acceso está activo.":"Sesión iniciada. Elige pago o código de regalo.");
+ };
+ $("login").addEventListener("click",async()=>{
+  const email=$("email").value.trim();
+  if(!email||!$("email").checkValidity()){status("Introduce un correo válido.");return;}
+  try{const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});if(error)throw error;status("Revisa tu correo para iniciar sesión.");}
+  catch(e){status("No se pudo enviar el enlace: "+e.message);}
+ });
+ $("checkout").addEventListener("click",async()=>{try{status("Preparando pago seguro…");const v=await call("create-checkout",{});if(v.already_active)return refresh();if(!v.url)throw Error("No hay enlace de pago");location.assign(v.url);}catch(e){status(e.message)}});
+ $("redeem").addEventListener("click",async()=>{try{const v=await call("redeem-code",{code:$("gift").value});status(v.ok?"Código activado.":"Código no válido o ya usado.");if(v.ok)await refresh();}catch(e){status(e.message)}});
+ for(const id of ["logout","logout2"])$(id).addEventListener("click",async()=>{await sb.auth.signOut();status("Sesión cerrada.");await refresh()});
+ sb.auth.onAuthStateChange(()=>{setTimeout(refresh,0)});
+ refresh();
+}
+</script><script src="./config.js"></script></body></html>
