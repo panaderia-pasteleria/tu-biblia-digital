@@ -32,11 +32,11 @@ Deno.serve(async req => {
      typeof language!=="string"||!/^(es|en|pt|it)$/.test(language)||
      !Number.isInteger(chapter)||Number(chapter)<1||Number(chapter)>200) return reply({error:"Invalid reference"},400);
   const admin=createClient(url,service,{auth:{persistSession:false}});
-  // Edición católica completa en inglés: textos CC0 importados en Postgres;
-  // el cliente nunca recibe permisos directos sobre esta tabla.
-  if(language==="en") {
+  // Ediciones católicas en inglés (CC0) e italiano (dominio público/CC BY 4.0).
+  // El cliente nunca recibe permisos directos sobre esta tabla.
+  if(language==="en" || language==="it") {
     const {data:row,error:chapterError}=await admin.from("bible_chapters")
-      .select("text,source_edition").eq("language","en").eq("book_id",book)
+      .select("text,source_edition").eq("language",language).eq("book_id",book)
       .eq("chapter",chapter).maybeSingle();
     if(chapterError)return reply({error:"Chapter storage error"},500);
     if(row)return reply({book,chapter,language,text:row.text,edition:row.source_edition});
