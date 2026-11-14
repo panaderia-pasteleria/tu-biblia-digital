@@ -1,0 +1,32 @@
+name: Validate Bible catalog and importer
+on:
+  push:
+    branches: [main, comercial/stripe-accesos-v1]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate catalog structure
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path("comercial/catalogo-catolico.json").read_text(encoding="utf-8"))
+          books=c["books"]
+          assert len(books)==73
+          assert len({b["id"] for b in books})==73
+          assert sum(b["testament"]=="AT" for b in books)==46
+          assert sum(b["testament"]=="NT" for b in books)==27
+          assert all(isinstance(b["chapters"],int) and 1<=b["chapters"]<=200 for b in books)
+          print("Catholic catalog: 73 unique books, 46 OT, 27 NT")
+          PY
+      - name: Run importer tests
+        run: python -m unittest discover -s scripts -p 'test_*.py' -v
