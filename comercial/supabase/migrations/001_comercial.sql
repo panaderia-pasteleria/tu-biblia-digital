@@ -32,32 +32,25 @@ for select to authenticated using ((select auth.uid()) = user_id);
 -- Nadie accede ni modifica gift_codes ni stripe_events por API publica.
 -- Solo la cuenta service_role / el SQL Editor pueden insertar y administrar codigos.
 
-create or replace function public.redeem_gift(p_code_hash text)
-returns boolean
-language plpgsql security definer set search_path = ''
+create or replace function public.redeem_gift(p_user uuid, p_code_hash text) returns boolean
+language plpgsql security invoker set search_path = ''
 as $$
-declare v_user uuid; v_code_id bigint;
+declare v_code_id bigint;
 begin
-  v_user := (select auth.uid());
-  if v_user is null then raise exception 'Login requerido'; end if;
-  -- No consumir un regalo si el usuario ya tiene acceso.
-  if exists (select 1 from public.entitlements where user_id = v_user) then return false; end if;
-  -- Bloqueo transaccional: una cuenta solo puede canjear un codigo disponible.
-  select id into v_code_id from public.gift_codes
-    where code_hash = p_code_hash and redeemed_by is null and disabled = false
-      and (expires_at is null or expires_at > now())
-    for update skip locked limit 1;
-  if v_code_id is null then return false; end if;
-  update public.gift_codes set redeemed_by = v_user, redeemed_at = now()
-    where id = v_code_id and redeemed_by is null;
-  insert into public.entitlements (user_id,access_kind)
-    values (v_user,'gift')
-    on conflict (user_id) do nothing;
-  return true;
+ if p_user is null then return false; end if;
+ if exists (select 1 from public.entitlements where user_id=p_user) then return false; end if;
+ select id into v_code_id from public.gift_codes where code_hash=p_code_hash
+   and redeemed_by is null and disabled=false and (expires_at is null or expires_at>now())
+   for update skip locked limit 1;
+ if v_code_id is null then return false; end if;
+ update public.gift_codes set redeemed_by=p_user,redeemed_at=now()
+   where id=v_code_id and redeemed_by is null;
+ insert into public.entitlements(user_id,access_kind) values(p_user,'gift')
+   on conflict(user_id) do nothing;
+ return true;
 end $$;
-revoke all on function public.redeem_gift(text) from public, anon;
-grant execute on function public.redeem_gift(text) to authenticated;
+revoke all on function public.redeem_gift(uuid,text) from PUBLIC,anon,authenticated;
+grant execute on function public.redeem_gift(uuid,text) to service_role;
 
--- SEGURIDAD: guardar hash SHA-256, nunca el codigo en claro. Generar codigos
--- criptograficamente aleatorios (>= 128 bits) desde un administrador seguro.
--- Las funciones Edge se despliegan con secretos, nunca subirlos a GitHub.
+-- Solo el servidor autenticado por SUPABASE_SERVICE_ROLE_KEY puede ejecutar el canje.
+-- Los clientes nunca deben tener acceso directo a la funcion ni a gift_codes.
