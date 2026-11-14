@@ -1,6 +1,4 @@
 -- Tu Biblia Digital: esquema comercial. Ejecutar en Supabase SQL Editor en un proyecto NUEVO.
-create extension if not exists pgcrypto with schema extensions;
-
 create table if not exists public.entitlements (
   user_id uuid primary key references auth.users(id) on delete cascade,
   access_kind text not null check (access_kind in ('stripe','gift','admin')),
@@ -42,6 +40,8 @@ declare v_user uuid; v_code_id bigint;
 begin
   v_user := (select auth.uid());
   if v_user is null then raise exception 'Login requerido'; end if;
+  -- No consumir un regalo si el usuario ya tiene acceso.
+  if exists (select 1 from public.entitlements where user_id = v_user) then return false; end if;
   -- Bloqueo transaccional: una cuenta solo puede canjear un codigo disponible.
   select id into v_code_id from public.gift_codes
     where code_hash = p_code_hash and redeemed_by is null and disabled = false
