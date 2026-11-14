@@ -23,6 +23,8 @@ Deno.serve(async req=>{
  if(access)return new Response(JSON.stringify({already_active:true}),{headers:{...cors,"content-type":"application/json"}});
  const session=await stripe.checkout.sessions.create({
  mode:"payment",
+ automatic_tax:{enabled:true},
+ billing_address_collection:"required",
  line_items:[{price:priceId,quantity:1}],
  customer_email:user.email,
  client_reference_id:user.id,
