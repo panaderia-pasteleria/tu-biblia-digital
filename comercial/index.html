@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Tu Biblia Digital | Acceso</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#111314;color:#f5f0e8}
+*{box-sizing:border-box}body{margin:0;min-height:100svh;display:grid;place-items:center;padding:24px}
+main{max-width:490px;width:100%;border:1px solid #393631;border-radius:22px;padding:clamp(22px,5vw,42px);background:#1c1c1b;box-shadow:0 18px 50px #0008}
+.kicker{color:#d2b478;letter-spacing:.22em;text-transform:uppercase;font-size:11px}
+h1{font-family:Georgia,serif;font-size:clamp(29px,6vw,43px);font-weight:normal;margin:.5em 0}.subtitle{color:#c5bbb0;line-height:1.6}
+.price{font-size:44px;font-weight:700;margin:24px 0 4px}.small{font-size:12px;color:#bdb5ab;line-height:1.5}
+section{margin-top:25px;padding-top:22px;border-top:1px solid #393631}
+label{display:block;margin-bottom:9px;font-size:14px}input{width:100%;padding:13px 14px;background:#101110;border:1px solid #666052;border-radius:9px;color:white;font:inherit}
+button{border:0;border-radius:9px;font:inherit;padding:14px 17px;cursor:pointer}
+.primary{width:100%;background:#d6b67a;color:#16130d;font-weight:650;margin-top:12px}.secondary{margin-top:12px;width:100%;background:transparent;color:#dfc895;border:1px solid #6f5d40}
+button:disabled{opacity:.45;cursor:not-allowed}#status{min-height:40px;margin-top:15px;color:#dbc9a7;font-size:14px;line-height:1.5}
+.hidden{display:none}a{color:#d6b67a}.email-notice{border:1px solid #746a4d;border-radius:9px;background:#25251f;padding:12px 14px;margin:12px 0;color:#efe5cb;font-size:14px;line-height:1.6}
+</style></head><body><main>
+<div class="kicker">Lectura bíblica sin distracciones</div>
+<h1>Tu Biblia Digital</h1>
+<p class="subtitle">Proyecto en preparación: 73 libros católicos disponibles en inglés e italiano para cuentas autorizadas. Las ediciones española y portuguesa todavía no están completas. Las compras siguen suspendidas mientras finalizamos las pruebas.</p>
+<div class="price">2,99 €</div><div class="small">Pago único, sin suscripción ni renovación automática. Acceso indefinido mientras el servicio esté operativo; no se garantiza disponibilidad perpetua. <a href="./condiciones-compra.html">Consultar condiciones</a>.</div>
+<section id="emailSection"><label for="email">1. Inicia sesión con tu correo</label>
+<input id="email" type="email" autocomplete="email" placeholder="correo@ejemplo.com">
+<button class="primary" id="login" type="button">Recibir enlace de acceso</button>
+<p id="emailNotice" class="email-notice hidden" role="status" aria-live="polite" aria-atomic="true"></p>
+<button id="resend" type="button" class="secondary hidden" disabled>Reenviar enlace</button>
+<p class="small">Enviaremos un enlace de inicio de sesión. No te pediremos contraseña. Si escribiste otro correo, podrás modificarlo para solicitar un enlace nuevo.</p></section>
+<section id="buy" class="hidden"><strong>2. Acceso a Tu Biblia Digital</strong>
+<button class="primary" id="checkout" disabled title="Venta suspendida hasta completar el contenido y las verificaciones legales">Compra temporalmente no disponible</button>
+<label for="gift" style="margin-top:18px">¿Tienes un código de regalo?</label>
+<input id="gift" autocomplete="off" placeholder="TBD-...">
+<button class="secondary" id="redeem">Canjear código gratuito</button>
+<button class="secondary" id="logout">Cerrar sesión</button>
+</section>
+<section id="unlocked" class="hidden"><strong>Acceso confirmado</strong>
+<p class="subtitle">Tu cuenta tiene una licencia activa. Puedes leer los 73 libros católicos en inglés e italiano; español y portugués están en preparación.</p>
+<p><a href="./lector.html">Abrir lector protegido (en desarrollo)</a></p>
+<button class="secondary" id="logout2">Cerrar sesión</button>
+</section>
+<p id="status" role="status" aria-live="polite"></p>
+<p class="small"><a href="./aviso-legal.html">Aviso legal (borrador)</a> · <a href="./condiciones-compra.html">Condiciones (borrador)</a> · <a href="./privacidad.html">Privacidad (borrador)</a> · <a href="./cookies.html">Cookies (borrador)</a> · <a href="./fuentes.html">Fuentes y licencias</a></p><p class="small">Versión de desarrollo: compras suspendidas hasta que el contenido y la documentación legal estén completos. <a href="./privacidad.html">Información de privacidad (borrador)</a>.</p>
+</main>
+<script src="./config.js"></script>
+<script type="module">
+import {createClient} from "https://esm.sh/@supabase/supabase-js@2.119.0";
+const cfg=window.TBD_CONFIG;
+const $=id=>document.getElementById(id);
+const status=(s)=>{$("status").textContent=s};
+if(!cfg?.supabaseUrl||!cfg?.supabaseAnonKey||!cfg?.functionsUrl){status("Sistema de pagos pendiente de configuración segura.");}
+else {
+ const sb=createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
+ const call=async(name,body)=>{
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session)throw Error("Primero inicia sesión");
+  const res=await fetch(cfg.functionsUrl+"/"+name,{method:"POST",headers:{"Content-Type":"application/json",apikey:cfg.supabaseAnonKey,Authorization:"Bearer "+session.access_token},body:JSON.stringify(body)});
+  const out=await res.json().catch(()=>({}));
+  if(!res.ok)throw Error(out.error||"No se pudo completar");
+  return out;
+ };
+ const refresh=async()=>{
+  const {data:{user}}=await sb.auth.getUser();
+  $("buy").classList.add("hidden");$("unlocked").classList.add("hidden");
+  $("emailSection").classList.toggle("hidden",!!user);
+  if(!user)return;
+  const {data,error}=await sb.from("entitlements").select("user_id").eq("user_id",user.id).maybeSingle();
+  if(error){status("No se pudo comprobar tu acceso.");return;}
+  $("unlocked").classList.toggle("hidden",!data);$("buy").classList.toggle("hidden",!!data);
+  status(data?"Tu acceso está activo.":"Sesión iniciada correctamente. La compra está suspendida; por ahora solo puedes activar un código de regalo.");
+ };
+ let sendingLink=false,linkSent=false,lastEmail="",resendAfter=0,resendTimer=null;
+ const updateResend=()=>{
+  const remaining=Math.max(0,Math.ceil((resendAfter-Date.now())/1000));
+  $("resend").disabled=sendingLink||remaining>0;
+  $("resend").textContent=remaining?"Reenviar enlace en "+remaining+" s":"¿No llegó? Reenviar enlace";
+  if(remaining===0&&resendTimer!==null){clearInterval(resendTimer);resendTimer=null;}
+ };
+ const resetMailRequest=()=>{
+  if(resendTimer!==null){clearInterval(resendTimer);resendTimer=null;}
+  sendingLink=false;linkSent=false;lastEmail="";resendAfter=0;
+  $("login").disabled=false;$("login").textContent="Recibir enlace de acceso";
+  $("emailNotice").classList.add("hidden");$("emailNotice").textContent="";
+  $("resend").classList.add("hidden");$("resend").disabled=true;
+ };
+ $("email").addEventListener("input",()=>{
+  if(linkSent&&$("email").value.trim()!==lastEmail)resetMailRequest();
+ });
+ const requestEmailLink=async(isResend=false)=>{
+  if(sendingLink||(!isResend&&linkSent)||isResend&&(!linkSent||Date.now()<resendAfter))return;
+  const email=$("email").value.trim();
+  if(!email||!$("email").checkValidity()){status("Introduce un correo válido.");return;}
+  sendingLink=true;
+  $("login").disabled=true;
+  $("resend").disabled=true;
+  $("login").textContent=linkSent?"✓ Enlace enviado":"Enviando enlace…";
+  $("emailNotice").classList.remove("hidden");
+  $("emailNotice").textContent=isResend?"Solicitando un enlace nuevo…":"Enviando el enlace de acceso…";
+  try{
+   const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});
+   if(error)throw error;
+   linkSent=true;lastEmail=email;
+   $("login").disabled=true;$("login").textContent="✓ Enlace enviado";
+   $("emailNotice").textContent="✓ Enlace solicitado para "+email+". Revisa tu bandeja de entrada (también spam) y abre el enlace para continuar. No tienes que volver a pulsar el botón.";
+   status("Solicitud enviada. Esperando que abras el enlace del correo.");
+   $("resend").classList.remove("hidden");
+   resendAfter=Date.now()+60000;
+   if(resendTimer!==null)clearInterval(resendTimer);
+   resendTimer=setInterval(updateResend,1000);
+  }catch(e){
+   const limited=e?.code==="over_email_send_rate_limit"||((e?.status===429)&&/email|rate limit/i.test(String(e?.message||"")));
+   if(limited){
+    $("emailNotice").textContent="No se ha enviado un nuevo enlace: nuestro servicio de correo ha alcanzado su límite temporal. Si ya recibiste un enlace anterior, comprueba tu bandeja de entrada y utilízalo. Si no, vuelve a intentarlo más tarde; cambiar de correo no soluciona este límite.";
+    status("Servicio de correos temporalmente limitado. No repitas el envío de inmediato.");
+   }else{
+    $("emailNotice").textContent="No se pudo "+(isResend?"reenviar":"enviar")+" el enlace. Inténtalo de nuevo más tarde.";
+    if(!linkSent)status("No hemos podido solicitar el correo. Revisa tu conexión y vuelve a intentarlo.");
+   }
+  }finally{
+   sendingLink=false;
+   if(!linkSent){$("login").disabled=false;$("login").textContent="Recibir enlace de acceso";}
+   if(linkSent)updateResend();
+  }
+ };
+ $("login").addEventListener("click",()=>requestEmailLink(false));
+ $("resend").addEventListener("click",()=>requestEmailLink(true));
+ $("checkout").addEventListener("click",async()=>{return;try{status("Preparando pago seguro…");const v=await call("create-checkout",{});if(v.already_active)return refresh();if(!v.url)throw Error("No hay enlace de pago");location.assign(v.url);}catch(e){status(e.message)}});
+ $("redeem").addEventListener("click",async()=>{try{const v=await call("redeem-code",{code:$("gift").value});status(v.ok?"Código activado.":"Código no válido o ya usado.");if(v.ok)await refresh();}catch(e){status(e.message)}});
+ for(const id of ["logout","logout2"])$(id).addEventListener("click",async()=>{await sb.auth.signOut();status("Sesión cerrada.");await refresh()});
+ sb.auth.onAuthStateChange(()=>{setTimeout(refresh,0)});
+ refresh();
+}
+</script></body></html>

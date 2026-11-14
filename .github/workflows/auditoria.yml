@@ -1,0 +1,40 @@
+name: Pruebas de integridad Tu Biblia Digital
+on:
+  push:
+    branches: [comercial/stripe-accesos-v1]
+  workflow_dispatch:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probar conversor con datos sintéticos
+        run: python -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Validar catálogo de 73 libros y páginas legales
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from html.parser import HTMLParser
+          root=Path('comercial')
+          books=json.loads((root/'catalogo-catolico.json').read_text(encoding='utf-8'))['books']
+          assert len(books)==73, f'Libros: {len(books)}'
+          assert len({b['id'] for b in books})==73
+          assert sum(b['testament']=='AT' for b in books)==46
+          assert sum(b['testament']=='NT' for b in books)==27
+          assert all(isinstance(b['chapters'],int) and b['chapters']>0 for b in books)
+          for name in ['aviso-legal.html','privacidad.html','cookies.html','condiciones-compra.html','index.html','lector.html']:
+              p=root/name
+              assert p.is_file(), f'Falta {p}'
+              HTMLParser().feed(p.read_text(encoding='utf-8'))
+          html=(root/'index.html').read_text(encoding='utf-8')
+          assert 'id="checkout" disabled' in html, 'Peligro: checkout habilitado sin auditoría'
+          assert 'Acceso indefinido mientras el servicio esté operativo' in html
+          assert 'id="saveNote"' not in (root/'lector.html').read_text(encoding='utf-8'), 'Notas sensibles activadas'
+          print('Catálogo, documentación y bloqueos de seguridad: OK')
+          PY

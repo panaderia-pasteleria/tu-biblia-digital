@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Lector protegido | Tu Biblia Digital</title>
+<style>body{margin:0;background:#111514;color:#f1eee6;font:16px/1.65 system-ui,sans-serif}main{max-width:760px;margin:auto;padding:24px}h1{font:normal 36px Georgia,serif}a{color:#e5c689}fieldset{border:1px solid #56574c;border-radius:12px;padding:18px}label{display:block;margin:10px 0}input,select,button{padding:10px;border-radius:8px;font:inherit}button{background:#e5c689;border:0;cursor:pointer}#chapter{white-space:pre-wrap;font:19px/1.9 Georgia,serif;margin:25px 0}#status{color:#e5c689}input{max-width:120px}</style>
+</head><body><main><a href="./">← Volver a mi cuenta</a><h1>Lectura protegida</h1>
+<p>Versión de desarrollo: disponibles los 73 libros en inglés de la edición católica <em>Original Douay-Rheims (1582/1609)</em>, distribuida bajo CC0. Español y portugués siguen en preparación. La edición italiana <em>Bibbia Martini</em> también está disponible bajo las condiciones de atribución CC BY 4.0. La compra permanece suspendida hasta completar las comprobaciones de lanzamiento.</p>
+<fieldset><legend>Buscar capítulo</legend>
+<label>Idioma <select id="language"><option value="en" selected>Inglés (Douay-Rheims, edición católica)</option><option value="es" disabled>Español (en preparación)</option><option value="pt" disabled>Portugués (en preparación)</option><option value="it">Italiano (Bibbia Martini, edición católica)</option></select></label>
+<label>Libro <select id="book"><option value="">Cargando catálogo…</option></select></label>
+<label>Capítulo <select id="chapterNumber"><option value="1">1</option></select></label>
+<button id="read">Leer capítulo</button> <button id="prev" type="button">← Anterior</button> <button id="next" type="button">Siguiente →</button></fieldset><section aria-label="Herramientas personales"><button id="smaller" type="button">A−</button> <button id="larger" type="button">A+</button> <button id="bookmark" type="button">☆ Guardar favorito</button><p style="color:#d9c6a6">Las notas personales están temporalmente desactivadas para proteger datos sensibles. Los favoritos siguen disponibles.</p></section>
+<p id="status" role="status" aria-live="polite">Comprobando sesión…</p><article id="chapter" aria-label="Texto bíblico"></article>
+<button id="logout">Cerrar sesión</button></main>
+<script src="./config.js"></script>
+<script type="module">
+import {createClient} from "https://esm.sh/@supabase/supabase-js@2.119.0";
+const cfg=window.TBD_CONFIG,$=id=>document.getElementById(id);
+if(!cfg?.supabaseUrl||!cfg?.supabaseAnonKey||!cfg?.functionsUrl){$("status").textContent="Configuración pendiente.";}
+else{
+const sb=createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
+let catalog=[];let activeUser=null;let fontSize=19;
+const chapterCount=book=>book?(($("language").value==="en"||$("language").value==="it")?({JOL:3,MAL:4}[book.id]||book.chapters):book.chapters):1;
+const fillChapters=()=>{const book=catalog.find(x=>x.id===$("book").value);$("chapterNumber").replaceChildren();for(let n=1;n<=chapterCount(book);n++){$("chapterNumber").add(new Option(String(n),String(n)));}};
+$("book").addEventListener("change",fillChapters);
+$("language").addEventListener("change",fillChapters);
+fetch("./catalogo-catolico.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("Catálogo no disponible");return r.json()}).then(data=>{catalog=data.books;$("book").replaceChildren();for(const b of catalog){$("book").add(new Option(`${b.testament==="AT"?"Antiguo":"Nuevo"} · ${b.name}`,b.id));}fillChapters();}).catch(e=>$("status").textContent=e.message);
+async function session(){const {data:{user}}=await sb.auth.getUser();if(!user)throw Error("Inicia sesión antes de leer.");const {data,error}=await sb.from("entitlements").select("user_id").eq("user_id",user.id).maybeSingle();if(error)throw error;if(!data)throw Error("Tu cuenta todavía no tiene acceso.");const {data:{session}}=await sb.auth.getSession();if(!session)throw Error("La sesión ha caducado.");activeUser=user;return session;}
+$("read").addEventListener("click",async()=>{const button=$("read");button.disabled=true;$("chapter").textContent="";$("status").textContent="Verificando acceso…";try{const token=await session();const response=await fetch(cfg.functionsUrl+"/read-licensed-chapter",{method:"POST",headers:{"Content-Type":"application/json","apikey":cfg.supabaseAnonKey,"Authorization":"Bearer "+token.access_token},body:JSON.stringify({book:$("book").value,chapter:Number($("chapterNumber").value),language:$("language").value})});const data=await response.json();if(!response.ok)throw Error(data.error||"No se pudo abrir el capítulo");$("chapter").textContent=data.text;$("status").textContent="Capítulo cargado.";await loadPersonal(); }catch(e){$("status").textContent=e.message;}finally{button.disabled=false;}});
+async function loadPersonal(){if(!activeUser)return;const book=$("book").value,chapter=Number($("chapterNumber").value);const {data,error}=await sb.from("reader_bookmarks").select("book_id").eq("user_id",activeUser.id).eq("book_id",book).eq("chapter",chapter).maybeSingle();if(error){$("status").textContent="Capítulo cargado; no se pudo recuperar el favorito.";return;}$("bookmark").textContent=data?"★ Quitar favorito":"☆ Guardar favorito";}
+async function personalAction(fn){try{await session();await fn();await loadPersonal();$("status").textContent="Cambios guardados.";}catch(e){$("status").textContent=e.message;}}
+$("bookmark").addEventListener("click",()=>personalAction(async()=>{const book_id=$("book").value,chapter=Number($("chapterNumber").value);const {data,error:readError}=await sb.from("reader_bookmarks").select("book_id").eq("user_id",activeUser.id).eq("book_id",book_id).eq("chapter",chapter).maybeSingle();if(readError)throw readError;const result=data?await sb.from("reader_bookmarks").delete().eq("user_id",activeUser.id).eq("book_id",book_id).eq("chapter",chapter):await sb.from("reader_bookmarks").insert({user_id:activeUser.id,book_id,chapter});if(result.error)throw result.error;}));
+$("larger").addEventListener("click",()=>{$("chapter").style.fontSize=(fontSize=Math.min(32,fontSize+2))+"px";});
+$("smaller").addEventListener("click",()=>{$("chapter").style.fontSize=(fontSize=Math.max(14,fontSize-2))+"px";});
+function navigate(delta){const selected=$("book").selectedIndex;const current=Number($("chapterNumber").value);const max=chapterCount(catalog[selected]);if(current+delta>=1&&current+delta<=max){$("chapterNumber").value=String(current+delta);}else{const next=selected+(delta>0?1:-1);if(next<0||next>=catalog.length)return;$("book").selectedIndex=next;fillChapters();$("chapterNumber").value=String(delta>0?1:chapterCount(catalog[next]));}$("read").click();}
+$("prev").addEventListener("click",()=>navigate(-1));
+$("next").addEventListener("click",()=>navigate(1));
+$("book").addEventListener("change",()=>{$("bookmark").textContent="☆ Guardar favorito";});
+$("chapterNumber").addEventListener("change",()=>{$("bookmark").textContent="☆ Guardar favorito";});
+$("logout").addEventListener("click",async()=>{await sb.auth.signOut();location.assign("./");});
+session().then(()=>$("status").textContent="Licencia verificada. Elige un capítulo.").catch(e=>$("status").textContent=e.message);
+}
+</script><footer style="max-width:760px;margin:auto;padding:0 24px 22px;color:#bbb;font-size:12px"><p>Fuente textual: Original Douay-Rheims Bible (1582/1609). Corpus digital <a href="https://github.com/janvier-s/original-douay-rheims">CC0 1.0</a>. No implica afiliación con los autores del conjunto de datos.</p><p>Italiano: <em>Bibbia Martini</em> (1769–1781), texto en dominio público. Datos estructurados de <a href="https://parolaviva.art/opendata">Giovanni Novelli / Parola Viva</a>, bajo <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Adaptación técnica: agrupación por capítulos y presentación como texto plano, 14/11/2026. Se mantiene el derecho a reutilizar esos materiales conforme a su licencia, sin restricciones adicionales; la compra remunera el servicio y las funciones de lectura, no la propiedad exclusiva del texto.</p><p><a href="./aviso-legal.html">Aviso legal</a> · <a href="./privacidad.html">Privacidad</a> · <a href="./cookies.html">Cookies</a></p></footer></body></html>
