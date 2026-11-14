@@ -1,6 +1,6 @@
 // Lector comercial: solo archivos de texto autorizados en el bucket PRIVADO.
 // Desplegar con verify_jwt=true. Nunca devolver URLs firmadas al navegador.
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.119.0";
 const url = Deno.env.get("SUPABASE_URL")!;
 const publishable = Deno.env.get("SUPABASE_ANON_KEY")!;
 const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
