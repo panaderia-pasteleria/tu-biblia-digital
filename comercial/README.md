@@ -46,3 +46,22 @@ Precio: `price_1UbUTQ2MlJh2e6JZRk2xiQAc`, EUR 2,99, `one_time`, `tax_behavior=in
 
 ## Permisos
 Proyecto de desarrollo separado. El propietario puede revisar y aprobar el despliegue cuando se completen dependencias y verificaciones.
+
+## Ejecución real al 14 nov 2026
+- Supabase proyecto `hbzyhdpkjmyarzsykhsx` (París, plan gratuito) creado y saludable.
+- SQL aplicado (tablas entitlements, gift_codes, stripe_events; permisos restringidos), canje `SECURITY INVOKER` solo `service_role`.
+- Bucket privado `tbd-biblia-protegida` creado, sujeto a licencia; sin archivos comerciales cargados.
+- Edge Functions `create-checkout`, `stripe-webhook`, `redeem-code`, `create-gift-codes` desplegadas en versión 1.
+- Clave PUBLICABLE Supabase y URL incorporadas a `comercial/config.js`. No hay secretos en GitHub.
+- `comercial/admin.html` añadido como panel de emisión solo para administrador autenticado.
+- Stripe producto `prod_VcjxawQHN7WOko` permanece **INACTIVO**. Precio fijo de producción verificado `price_1UbUTQ2MlJh2e6JZRk2xiQAc`.
+
+## Intervención del propietario para completar la conexión
+El conector Supabase disponible no gestiona Edge Function Secrets ni Auth URL Configuration y el conector Stripe no permite recuperar claves secretas existentes. El propietario debe completar en sus respectivos paneles, sin enviarnos ninguna clave:
+
+1. Supabase > Project Settings > Edge Functions > Secrets: añadir `APP_ORIGIN=https://app.tubibliadigital.com`, `STRIPE_PRICE_ID=price_1UbUTQ2MlJh2e6JZRk2xiQAc` (solo para producción), `STRIPE_SECRET_KEY` correspondiente al entorno, `STRIPE_WEBHOOK_SECRET` del webhook creado en Stripe, `ADMIN_USER_ID` tras acceder por correo (UUID de Supabase Auth).
+2. Supabase > Authentication > URL Configuration: Site URL `https://app.tubibliadigital.com`; redirecciones `https://app.tubibliadigital.com/comercial/` y `https://app.tubibliadigital.com/comercial/admin.html` según configuración de despliegue.
+3. Stripe > Developers > Webhooks: crear endpoint `https://hbzyhdpkjmyarzsykhsx.supabase.co/functions/v1/stripe-webhook`, eventos `checkout.session.completed`, `checkout.session.async_payment_succeeded`, y copiar firma al gestor secreto Supabase.
+4. No publicar ni fusionar hasta probar correctamente el entorno de PRUEBAS. Precio de prueba propio, secret key de prueba, webhook de prueba, sin pagos reales.
+5. Confirmar licencias comerciales del contenido y completar el contenido privado (el archivo abierto anterior no puede protegerse retroactivamente).
+6. Registrar/validar obligaciones de IVA en Stripe Tax antes de ventas internacionales; los ajustes de Tax actuales no recaudan aún IVA (sin registros).
