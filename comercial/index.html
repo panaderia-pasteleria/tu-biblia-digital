@@ -17,14 +17,14 @@ button:disabled{opacity:.45;cursor:not-allowed}#status{min-height:40px;margin-to
 </style></head><body><main>
 <div class="kicker">Lectura bíblica sin distracciones</div>
 <h1>Tu Biblia Digital</h1>
-<p class="subtitle">73 libros de tradición católica · 4 idiomas · favoritos, notas y lectura sin conexión.</p>
+<p class="subtitle">Proyecto en preparación: catálogo católico de 73 libros. El contenido y los idiomas están pendientes de verificación.</p>
 <div class="price">2,99 €</div><div class="small">Pago único. Sin anuncios ni suscripciones. Acceso sujeto a las condiciones de compra.</div>
 <section><label for="email">1. Inicia sesión con tu correo</label>
 <input id="email" type="email" autocomplete="email" placeholder="correo@ejemplo.com">
 <button class="primary" id="login">Recibir enlace de acceso</button>
 <p class="small">Enviaremos un enlace de inicio de sesión. No te pediremos contraseña.</p></section>
 <section id="buy" class="hidden"><strong>2. Elige cómo obtener acceso</strong>
-<button class="primary" id="checkout">Comprar por 2,99 €</button>
+<button class="primary" id="checkout" disabled title="Venta suspendida hasta completar el contenido y las verificaciones legales">Compra temporalmente no disponible</button>
 <label for="gift" style="margin-top:18px">¿Tienes un código de regalo?</label>
 <input id="gift" autocomplete="off" placeholder="TBD-...">
 <button class="secondary" id="redeem">Canjear código gratuito</button>
@@ -36,7 +36,7 @@ button:disabled{opacity:.45;cursor:not-allowed}#status{min-height:40px;margin-to
 <button class="secondary" id="logout2">Cerrar sesión</button>
 </section>
 <p id="status" role="status" aria-live="polite"></p>
-<p class="small">Versión de desarrollo: Stripe está en modo real. No completes una compra hasta confirmar que el contenido está disponible.</p>
+<p class="small">Versión de desarrollo: compras suspendidas hasta que el contenido y la documentación legal estén completos. <a href="./privacidad.html">Información de privacidad (borrador)</a>.</p>
 </main>
 <script type="module">
 import {createClient} from "https://esm.sh/@supabase/supabase-js@2";
@@ -69,7 +69,7 @@ else {
   try{const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});if(error)throw error;status("Revisa tu correo para iniciar sesión.");}
   catch(e){status("No se pudo enviar el enlace: "+e.message);}
  });
- $("checkout").addEventListener("click",async()=>{try{status("Preparando pago seguro…");const v=await call("create-checkout",{});if(v.already_active)return refresh();if(!v.url)throw Error("No hay enlace de pago");location.assign(v.url);}catch(e){status(e.message)}});
+ $("checkout").addEventListener("click",async()=>{return;try{status("Preparando pago seguro…");const v=await call("create-checkout",{});if(v.already_active)return refresh();if(!v.url)throw Error("No hay enlace de pago");location.assign(v.url);}catch(e){status(e.message)}});
  $("redeem").addEventListener("click",async()=>{try{const v=await call("redeem-code",{code:$("gift").value});status(v.ok?"Código activado.":"Código no válido o ya usado.");if(v.ok)await refresh();}catch(e){status(e.message)}});
  for(const id of ["logout","logout2"])$(id).addEventListener("click",async()=>{await sb.auth.signOut();status("Sesión cerrada.");await refresh()});
  sb.auth.onAuthStateChange(()=>{setTimeout(refresh,0)});
