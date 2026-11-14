@@ -6,8 +6,8 @@
 <p>Versión de desarrollo. Solo se mostrarán capítulos cuyos derechos de distribución comercial estén verificados y que se hayan cargado en el repositorio privado.</p>
 <fieldset><legend>Buscar capítulo</legend>
 <label>Idioma <select id="language"><option value="es">Español</option><option value="en">Inglés</option><option value="pt">Portugués</option><option value="it">Italiano</option></select></label>
-<label>Código del libro (catálogo autorizado) <input id="book" placeholder="GEN" maxlength="12" autocomplete="off"></label>
-<label>Capítulo <input id="chapterNumber" type="number" min="1" max="200" value="1"></label>
+<label>Libro <select id="book"><option value="">Cargando catálogo…</option></select></label>
+<label>Capítulo <select id="chapterNumber"><option value="1">1</option></select></label>
 <button id="read">Leer capítulo</button></fieldset>
 <p id="status" role="status" aria-live="polite">Comprobando sesión…</p><article id="chapter" aria-label="Texto bíblico"></article>
 <button id="logout">Cerrar sesión</button></main>
@@ -18,8 +18,12 @@ const cfg=window.TBD_CONFIG,$=id=>document.getElementById(id);
 if(!cfg?.supabaseUrl||!cfg?.supabaseAnonKey||!cfg?.functionsUrl){$("status").textContent="Configuración pendiente.";}
 else{
 const sb=createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
+let catalog=[];
+const fillChapters=()=>{const book=catalog.find(x=>x.id===$("book").value);$("chapterNumber").replaceChildren();for(let n=1;n<=(book?.chapters||1);n++){$("chapterNumber").add(new Option(String(n),String(n)));}};
+$("book").addEventListener("change",fillChapters);
+fetch("./catalogo-catolico.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("Catálogo no disponible");return r.json()}).then(data=>{catalog=data.books;$("book").replaceChildren();for(const b of catalog){$("book").add(new Option(`${b.testament==="AT"?"Antiguo":"Nuevo"} · ${b.name}`,b.id));}fillChapters();}).catch(e=>$("status").textContent=e.message);
 async function session(){const {data:{user}}=await sb.auth.getUser();if(!user)throw Error("Inicia sesión antes de leer.");const {data,error}=await sb.from("entitlements").select("user_id").eq("user_id",user.id).maybeSingle();if(error)throw error;if(!data)throw Error("Tu cuenta todavía no tiene acceso.");const {data:{session}}=await sb.auth.getSession();if(!session)throw Error("La sesión ha caducado.");return session;}
-$("read").addEventListener("click",async()=>{const button=$("read");button.disabled=true;$("chapter").textContent="";$("status").textContent="Verificando acceso…";try{const token=await session();const response=await fetch(cfg.functionsUrl+"/read-licensed-chapter",{method:"POST",headers:{"Content-Type":"application/json","apikey":cfg.supabaseAnonKey,"Authorization":"Bearer "+token.access_token},body:JSON.stringify({book:$("book").value.trim().toUpperCase(),chapter:Number($("chapterNumber").value),language:$("language").value})});const data=await response.json();if(!response.ok)throw Error(data.error||"No se pudo abrir el capítulo");$("chapter").textContent=data.text;$("status").textContent="Capítulo cargado."; }catch(e){$("status").textContent=e.message;}finally{button.disabled=false;}});
+$("read").addEventListener("click",async()=>{const button=$("read");button.disabled=true;$("chapter").textContent="";$("status").textContent="Verificando acceso…";try{const token=await session();const response=await fetch(cfg.functionsUrl+"/read-licensed-chapter",{method:"POST",headers:{"Content-Type":"application/json","apikey":cfg.supabaseAnonKey,"Authorization":"Bearer "+token.access_token},body:JSON.stringify({book:$("book").value,chapter:Number($("chapterNumber").value),language:$("language").value})});const data=await response.json();if(!response.ok)throw Error(data.error||"No se pudo abrir el capítulo");$("chapter").textContent=data.text;$("status").textContent="Capítulo cargado."; }catch(e){$("status").textContent=e.message;}finally{button.disabled=false;}});
 $("logout").addEventListener("click",async()=>{await sb.auth.signOut();location.assign("./");});
 session().then(()=>$("status").textContent="Licencia verificada. Elige un capítulo.").catch(e=>$("status").textContent=e.message);
 }
