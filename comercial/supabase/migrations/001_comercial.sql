@@ -25,6 +25,10 @@ create index if not exists gift_codes_available_idx on public.gift_codes (disabl
 alter table public.entitlements enable row level security;
 alter table public.gift_codes enable row level security;
 alter table public.stripe_events enable row level security;
+revoke all on public.entitlements from anon, authenticated;
+grant select on public.entitlements to authenticated;
+revoke all on public.gift_codes from anon, authenticated;
+revoke all on public.stripe_events from anon, authenticated;
 
 drop policy if exists "Read only own access" on public.entitlements;
 create policy "Read only own access" on public.entitlements
