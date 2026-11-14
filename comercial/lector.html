@@ -13,7 +13,7 @@
 <button id="logout">Cerrar sesión</button></main>
 <script src="./config.js"></script>
 <script type="module">
-import {createClient} from "https://esm.sh/@supabase/supabase-js@2";
+import {createClient} from "https://esm.sh/@supabase/supabase-js@2.119.0";
 const cfg=window.TBD_CONFIG,$=id=>document.getElementById(id);
 if(!cfg?.supabaseUrl||!cfg?.supabaseAnonKey||!cfg?.functionsUrl){$("status").textContent="Configuración pendiente.";}
 else{
