@@ -31,8 +31,17 @@ Deno.serve(async req => {
   if(typeof book!=="string"||!/^[A-Z0-9]{2,12}$/.test(book)||
      typeof language!=="string"||!/^(es|en|pt|it)$/.test(language)||
      !Number.isInteger(chapter)||Number(chapter)<1||Number(chapter)>200) return reply({error:"Invalid reference"},400);
-  const objectPath=`licensed/${language}/${book}/${chapter}.txt`;
   const admin=createClient(url,service,{auth:{persistSession:false}});
+  // Edición católica completa en inglés: textos CC0 importados en Postgres;
+  // el cliente nunca recibe permisos directos sobre esta tabla.
+  if(language==="en") {
+    const {data:row,error:chapterError}=await admin.from("bible_chapters")
+      .select("text,source_edition").eq("language","en").eq("book_id",book)
+      .eq("chapter",chapter).maybeSingle();
+    if(chapterError)return reply({error:"Chapter storage error"},500);
+    if(row)return reply({book,chapter,language,text:row.text,edition:row.source_edition});
+  }
+  const objectPath=`licensed/${language}/${book}/${chapter}.txt`;
   const {data:file,error:fileError}=await admin.storage.from(bucket).download(objectPath);
   if(fileError||!file) return reply({error:"Chapter unavailable"},404);
   if(file.size>1024*1024) return reply({error:"Chapter too large"},413);
