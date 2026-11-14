@@ -1,7 +1,6 @@
-// Configuración PUBLICA del navegador. Reemplazar al desplegar Supabase.
-// La clave "anon" es pública: NUNCA poner service_role ni claves secretas de Stripe aquí.
+// Clave publica de Supabase (puede estar en navegador). Nunca poner claves secretas aqui.
 window.TBD_CONFIG = {
-  supabaseUrl: "",
-  supabaseAnonKey: "",
-  functionsUrl: ""
+  supabaseUrl: "https://hbzyhdpkjmyarzsykhsx.supabase.co",
+  supabaseAnonKey: "sb_publishable_r19uZpKbtKSR2yfaLozheQ_61v9Q245",
+  functionsUrl: "https://hbzyhdpkjmyarzsykhsx.supabase.co/functions/v1"
 };
