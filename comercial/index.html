@@ -106,8 +106,14 @@ else {
    if(resendTimer!==null)clearInterval(resendTimer);
    resendTimer=setInterval(updateResend,1000);
   }catch(e){
-   $("emailNotice").textContent="No se pudo "+(isResend?"reenviar":"enviar")+" el enlace: "+e.message;
-   if(!linkSent)status("No se envió el correo. Puedes intentarlo de nuevo.");
+   const limited=e?.code==="over_email_send_rate_limit"||((e?.status===429)&&/email|rate limit/i.test(String(e?.message||"")));
+   if(limited){
+    $("emailNotice").textContent="No se ha enviado un nuevo enlace: nuestro servicio de correo ha alcanzado su límite temporal. Si ya recibiste un enlace anterior, comprueba tu bandeja de entrada y utilízalo. Si no, vuelve a intentarlo más tarde; cambiar de correo no soluciona este límite.";
+    status("Servicio de correos temporalmente limitado. No repitas el envío de inmediato.");
+   }else{
+    $("emailNotice").textContent="No se pudo "+(isResend?"reenviar":"enviar")+" el enlace. Inténtalo de nuevo más tarde.";
+    if(!linkSent)status("No hemos podido solicitar el correo. Revisa tu conexión y vuelve a intentarlo.");
+   }
   }finally{
    sendingLink=false;
    if(!linkSent){$("login").disabled=false;$("login").textContent="Recibir enlace de acceso";}
