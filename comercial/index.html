@@ -36,8 +36,9 @@ button:disabled{opacity:.45;cursor:not-allowed}#status{min-height:40px;margin-to
 <button class="secondary" id="logout2">Cerrar sesión</button>
 </section>
 <p id="status" role="status" aria-live="polite"></p>
-<p class="small"><a href="./aviso-legal.html">Aviso legal (borrador)</a> · <a href="./condiciones-compra.html">Condiciones (borrador)</a> · <a href="./privacidad.html">Privacidad (borrador)</a></p><p class="small">Versión de desarrollo: compras suspendidas hasta que el contenido y la documentación legal estén completos. <a href="./privacidad.html">Información de privacidad (borrador)</a>.</p>
+<p class="small"><a href="./aviso-legal.html">Aviso legal (borrador)</a> · <a href="./condiciones-compra.html">Condiciones (borrador)</a> · <a href="./privacidad.html">Privacidad (borrador)</a> · <a href="./cookies.html">Cookies (borrador)</a></p><p class="small">Versión de desarrollo: compras suspendidas hasta que el contenido y la documentación legal estén completos. <a href="./privacidad.html">Información de privacidad (borrador)</a>.</p>
 </main>
+<script src="./config.js"></script>
 <script type="module">
 import {createClient} from "https://esm.sh/@supabase/supabase-js@2";
 const cfg=window.TBD_CONFIG;
@@ -75,4 +76,4 @@ else {
  sb.auth.onAuthStateChange(()=>{setTimeout(refresh,0)});
  refresh();
 }
-</script><script src="./config.js"></script></body></html>
+</script></body></html>
