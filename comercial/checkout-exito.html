@@ -1,1 +1,23 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Pago recibido | Tu Biblia Digital</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#121312;color:#f0e9dc;font-family:system-ui}main{max-width:440px;padding:35px;text-align:center}a{color:#d6b67a}</style></head><body><main><h1>Gracias por tu compra</h1><p>Stripe está verificando el pago. Tu acceso se activará cuando recibamos la confirmación segura. Puedes volver a comprobarlo en tu cuenta.</p><p><a href="./">Comprobar mi acceso</a></p></main></body></html>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Confirmación de pago | Tu Biblia Digital</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#121312;color:#f0e9dc;font-family:system-ui}main{max-width:460px;padding:35px;text-align:center}a{color:#d6b67a}#status{line-height:1.7}</style></head><body><main><h1>Confirmando tu acceso</h1><p id="status" role="status" aria-live="polite">Estamos comprobando la licencia de tu cuenta. No es necesario repetir el pago.</p><p><a href="./">Volver a mi cuenta</a></p></main><script src="./config.js"></script><script type="module">
+import {createClient} from "https://esm.sh/@supabase/supabase-js@2";
+const cfg=window.TBD_CONFIG;
+const status=document.getElementById("status");
+if(!cfg?.supabaseUrl||!cfg?.supabaseAnonKey){status.textContent="No se pudo cargar la configuración. Vuelve a tu cuenta para comprobar el acceso.";}
+else{
+const sb=createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+(async()=>{
+try{
+const {data:{user},error}=await sb.auth.getUser();
+if(error||!user){status.textContent="Inicia sesión con el mismo correo utilizado al comprar para comprobar tu acceso.";return;}
+for(let i=0;i<12;i++){
+const {data,error:accessError}=await sb.from("entitlements").select("user_id").eq("user_id",user.id).maybeSingle();
+if(accessError)throw accessError;
+if(data){status.textContent="¡Pago confirmado y acceso activado! Ya puedes entrar al área de lectura.";return;}
+if(i<11)await wait(2500);
+}
+status.textContent="Aún no consta el acceso. Si Stripe confirmó tu pago, espera unos minutos y vuelve a tu cuenta. No repitas la compra.";
+}catch{status.textContent="No se pudo verificar el acceso ahora. Vuelve a tu cuenta más tarde. No repitas el pago.";}
+})();
+}
+</script></body></html>
